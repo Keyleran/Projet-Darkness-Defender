@@ -1,0 +1,9 @@
+1) Se connecter sur son compte Github
+2) Télécharger le logiciel "Github" sur le site : https://github.com/
+3) Lancer Github
+3) S'il n'y a aucun fichier dans la barre de gauche de Github, 
+cliquer sur le "+" en haut à gauche.
+Cloner le projet Projet-Darkness-Defender
+Choisir où placer le dossier de repository sur le PC.
+4) Placer les fichiers à uploader dans le repository
+5) Synchroniser et envoyer les fichiers
