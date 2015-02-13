@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------
 // Project: Darkness Defender
-// Script: ArrowScript.cs
+// Script: ControlCharacterScript.cs
 // Author: Kevin Rey 3A 3DJV
 // --------------------------------------------------
 
