@@ -16,6 +16,8 @@ using System.Collections;
 // --------------------------------------------------
 public class SamplePoolScript : MonoBehaviour
 {
+    private SamplesScript _sampleInUse = null;
+
     [SerializeField]
     SamplesScript[] _samples;
 
@@ -28,10 +30,18 @@ public class SamplePoolScript : MonoBehaviour
     // _samples[6] => magic
     // _samples[7] => detector
 
-    int index = 0;
-
     public SamplesScript GetSample(int type)
     {
+        _sampleInUse = _samples[type];
         return _samples[type];
+    }
+
+    public void ReturnSample()
+    {
+        if(_sampleInUse != null)
+        {
+            _sampleInUse.Transform.position = this.gameObject.transform.position;
+            _sampleInUse = null;
+        }
     }
 }

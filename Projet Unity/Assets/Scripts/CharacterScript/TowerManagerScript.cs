@@ -16,40 +16,41 @@ using System.Collections;
 // --------------------------------------------------
 public class TowerManagerScript : MonoBehaviour
 {
+    private bool constructMode = false;
+    private int  constructChoose = 0;
+
     [SerializeField]
     BarricadePoolScript _barricadePoolScript;
 
     [SerializeField]
     SamplePoolScript _samplesPoolScript;
 
-    private bool constructMode   = false;
-    private int  constructChoose = 0;
-
     void FixedUpdate()
     {
         if (constructMode)
         {
+            // Pointeur - Permet de positioner un sample ou une tour à l'endroit où le curseur pointe
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit = new RaycastHit();
 
             if (Physics.Raycast(ray, out hit))
             {
-                if (hit.collider.tag == "Ground")
-                {
-                    float positionX = hit.transform.position.x;
-                    float positionY = hit.transform.position.y + 0.5f;
-                    float positionZ = hit.transform.position.z;
+                float positionX = hit.transform.position.x;
+                float positionY = hit.transform.position.y + 0.5f;
+                float positionZ = hit.transform.position.z;
 
+                _samplesPoolScript.ReturnSample();
+                if ((hit.collider.tag == "Ground")&&(constructChoose == 0))
+                {
+                    // Sample = Aperçu, permet de voir où seront placés les élèments
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
                     sample.Transform.position = new Vector3(positionX, positionY + 0.25f, positionZ);
 
-                    if((Input.GetMouseButtonDown(0))&&(constructChoose == 0))
+                    if(Input.GetMouseButtonDown(0))
                     {
-                        BaricadeScript bar = _barricadePoolScript.GetBarricade();
+                        BarricadeScript bar = _barricadePoolScript.GetBarricade(hit.collider.gameObject);
                         if(bar != null)
                         {
-                            bar.gameObject.SetActive(true);
-
                             bar.Transform.position = new Vector3(positionX, positionY + 0.25f, positionZ);
                             hit.collider.tag = "GroundUse";
                         }
@@ -59,20 +60,29 @@ public class TowerManagerScript : MonoBehaviour
                         }
                     }
                 }
-
             }
         }
 
-        if(Input.GetButtonDown("ConstructMode"))
+        if (Input.GetButtonDown("SellTower"))
         {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit = new RaycastHit();
+
+            if (Physics.Raycast(ray, out hit))
+            {
+                SellTower(hit);
+            }            
+        }
+
+        if (Input.GetButtonDown("ConstructMode"))
+        {
+            _samplesPoolScript.ReturnSample();
             constructMode = !constructMode;
         }
 
-
-
-
-
-        if (Input.GetButtonDown("SelectBaricade"))
+        // Choix de la tour à construire
+        #region Choix de la tour à construire
+        if (Input.GetButtonDown("SelectBarricade"))
         {
             constructChoose = 0;
         }
@@ -110,6 +120,32 @@ public class TowerManagerScript : MonoBehaviour
         if (Input.GetButtonDown("SelectDetector"))
         {
             constructChoose = 7;
+        }
+        #endregion
+    }
+
+    // Fonction permettant de vendre les tours/barrcades
+    void SellTower(RaycastHit hit)
+    {
+        switch(hit.collider.tag)
+        {
+            case "Barricade":
+                _barricadePoolScript.ReturnBarricade((BarricadeScript) hit.collider.gameObject.GetComponent("BarricadeScript"));
+                break;
+            case "Shooter":
+                break;
+            case "Canon":
+                break;
+            case "Fire":
+                break;
+            case "Ice":
+                break;
+            case "Poison":
+                break;
+            case "Magic":
+                break;
+            case "Detector":
+                break;
         }
     }
 }
