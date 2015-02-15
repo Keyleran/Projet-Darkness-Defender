@@ -44,14 +44,14 @@ public class TowerManagerScript : MonoBehaviour
                 {
                     // Sample = Aperçu, permet de voir où seront placés les élèments
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
-                    sample.Transform.position = new Vector3(positionX, positionY + 0.25f, positionZ);
+                    sample.Transform.position = new Vector3(positionX, positionY , positionZ);
 
                     if(Input.GetMouseButtonDown(0))
                     {
                         BarricadeScript bar = _barricadePoolScript.GetBarricade(hit.collider.gameObject);
                         if(bar != null)
                         {
-                            bar.Transform.position = new Vector3(positionX, positionY + 0.25f, positionZ);
+                            bar.Transform.position = new Vector3(positionX, positionY , positionZ);
                             hit.collider.tag = "GroundUse";
                         }
                         else
