@@ -1,24 +1,25 @@
 ﻿// --------------------------------------------------
 // Project: Darkness Defender
-// Script: BarricadeScript.cs
+// Script: AmmoScript.cs
 // Author: Kevin Rey 3A 3DJV
 // --------------------------------------------------
 
 // Library
 using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 
 // --------------------------------------------------
 // 
-// Script ajoutant des champs aux barricades
+// Script des projectiles de la tour Shooter
 // 
 // --------------------------------------------------
-public class BarricadeScript : MonoBehaviour 
+public class AmmoScript : MonoBehaviour 
 {
+
     public int id = 0;
-    public GameObject ground = null;
-     
+
     [SerializeField]
     Transform _transform;
 
@@ -50,22 +51,5 @@ public class BarricadeScript : MonoBehaviour
             _rigidbody = value;
         }
     }
-
-
-
-
-    /*
-    public void UpdateNeighbor()
-    {
-        if(ground != null)
-        {
-            SphereCollider Detect = (SphereCollider) ground.GetComponent("SphereCollider");
-            Detect.
-            foreach(Detect.rigidbody.)
-            {
-
-            }
-        }
-    }
-     */
+	
 }

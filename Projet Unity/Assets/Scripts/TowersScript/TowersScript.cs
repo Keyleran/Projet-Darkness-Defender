@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------
 // Project: Darkness Defender
-// Script: BarricadeScript.cs
+// Script: TowersScript.cs
 // Author: Kevin Rey 3A 3DJV
 // --------------------------------------------------
 
@@ -11,14 +11,14 @@ using System.Collections;
 
 // --------------------------------------------------
 // 
-// Script ajoutant des champs aux barricades
+// Script pour l'ensemble des tours
 // 
 // --------------------------------------------------
-public class BarricadeScript : MonoBehaviour 
+public class TowersScript : MonoBehaviour 
 {
     public int id = 0;
-    public GameObject ground = null;
-     
+    public GameObject barricade = null;
+
     [SerializeField]
     Transform _transform;
 
@@ -50,22 +50,4 @@ public class BarricadeScript : MonoBehaviour
             _rigidbody = value;
         }
     }
-
-
-
-
-    /*
-    public void UpdateNeighbor()
-    {
-        if(ground != null)
-        {
-            SphereCollider Detect = (SphereCollider) ground.GetComponent("SphereCollider");
-            Detect.
-            foreach(Detect.rigidbody.)
-            {
-
-            }
-        }
-    }
-     */
 }

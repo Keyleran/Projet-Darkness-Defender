@@ -7,7 +7,7 @@
 // Library
 using UnityEngine;
 using System.Collections;
-
+using System.Collections.Generic;
 
 // --------------------------------------------------
 // 
@@ -16,38 +16,58 @@ using System.Collections;
 // --------------------------------------------------
 public class ShooterScript : MonoBehaviour 
 {
-    public int id = 0;
-    public GameObject barricade = null;
-
     [SerializeField]
     Transform _transform;
 
     [SerializeField]
-    Rigidbody _rigidbody;
+    AmmoPoolScript _ammoShooter;
 
-    // Champs permettant de placer une barricade
-    public Transform Transform
+    [SerializeField]
+    float _projectileSpeed;
+
+    [SerializeField]
+    float _shootDelay;
+
+    private List<Transform> _enemiesTransform = new List<Transform>();
+
+    void OnTriggerEnter(Collider col)
     {
-        get
+        if(col.tag == "Enemy")
         {
-            return _transform;
-        }
-        set
-        {
-            _transform = value;
+            _enemiesTransform.Add(col.transform);
+            if (_enemiesTransform.Count == 1)
+            {
+                StartCoroutine("TryToShoot");
+            }
         }
     }
 
-    // Champs permettant d'appliquer de la physique
-    public Rigidbody Rigidbody
+    void OnTriggerExit(Collider col)
     {
-        get
+        if (col.tag == "Enemy")
         {
-            return _rigidbody;
+            _enemiesTransform.Remove(col.transform);
+            if (_enemiesTransform.Count == 0)
+            {
+                StopCoroutine("TryToShoot");
+            }
         }
-        set
+    }
+
+    IEnumerator TryToShoot()
+    {
+        while (true)
         {
-            _rigidbody = value;
+            yield return new WaitForFixedUpdate();
+            var ps = _ammoShooter.GetProjectile();
+
+            ps.gameObject.SetActive(true);
+
+            ps.Transform.position = _transform.position;
+
+            ps.Rigidbody.velocity = (_enemiesTransform[0].position - _transform.position).normalized * _projectileSpeed;
+
+            yield return new WaitForSeconds(_shootDelay);
         }
     }
 }

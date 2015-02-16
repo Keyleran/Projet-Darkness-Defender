@@ -56,11 +56,6 @@ public class BarricadePoolScript : MonoBehaviour
         idBarUnset.Add(barricade.id);
         barricade.gameObject.SetActive(false);
         barricade.ground.tag = "Ground";
-
-
-
         barricade.ground = null;
-
-        
     }
 }
