@@ -26,23 +26,23 @@ public class BarricadePoolScript : MonoBehaviour
     // Renvoi une barricade à chaque appel
     public BarricadeScript GetBarricade(GameObject ground)
     {
-        if(idBarUnset.Count != 0)
+        if((idBarUnset.Count != 0)||(index < _barricade.Length))
         {
-            int id = idBarUnset[0];
-            idBarUnset.Remove(id);
-            BarricadeScript barricade = _barricade[id];
+            BarricadeScript barricade = null;
+            if(idBarUnset.Count != 0)
+            {
+                int id = idBarUnset[0];
+                idBarUnset.Remove(id);
+                barricade = _barricade[id];
+            }
+            else if (index < _barricade.Length)
+            {
+                barricade = _barricade[index];
+                barricade.id = index;
+                index++;
+            }
             barricade.ground = ground;
             barricade.gameObject.SetActive(true);
-            return barricade;
-        }
-
-        if(index < _barricade.Length)
-        {
-            BarricadeScript barricade = _barricade[index];
-            barricade.gameObject.SetActive(true);
-            barricade.ground = ground;
-            barricade.id = index;
-            index++;
             return barricade;
         }
 
@@ -56,6 +56,11 @@ public class BarricadePoolScript : MonoBehaviour
         idBarUnset.Add(barricade.id);
         barricade.gameObject.SetActive(false);
         barricade.ground.tag = "Ground";
+
+
+
         barricade.ground = null;
+
+        
     }
 }
