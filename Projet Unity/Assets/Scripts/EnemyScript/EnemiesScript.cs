@@ -23,7 +23,6 @@ public class EnemiesScript : MonoBehaviour
     [SerializeField]
     Rigidbody _rigidbody;
 
-    // Champs permettant de placer une barricade
     public Transform Transform
     {
         get
@@ -36,7 +35,6 @@ public class EnemiesScript : MonoBehaviour
         }
     }
 
-    // Champs permettant d'appliquer de la physique
     public Rigidbody Rigidbody
     {
         get

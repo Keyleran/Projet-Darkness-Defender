@@ -8,17 +8,6 @@
 using UnityEngine;
 using System.Collections;
 
-// Define
-static class Constants
-{
-    public const short Shooter  = 1;
-    public const short Canon    = 2;
-    public const short Fire     = 3;
-    public const short Ice      = 4;
-    public const short Poison   = 5;
-    public const short Magic    = 6;
-    public const short Detector = 7;
-}
 
 // --------------------------------------------------
 // 
@@ -29,6 +18,18 @@ public class TowerManagerScript : MonoBehaviour
 {
     private bool constructMode = false;
     private int  constructChoose = 0;
+
+    // Define
+    static class Constants
+    {
+        public const short Shooter = 1;
+        public const short Canon = 2;
+        public const short Fire = 3;
+        public const short Ice = 4;
+        public const short Poison = 5;
+        public const short Magic = 6;
+        public const short Detector = 7;
+    }
 
     #region [SerializeField] des differents poolScripts
     [SerializeField]
