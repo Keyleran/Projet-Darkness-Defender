@@ -12,7 +12,7 @@ using System.Collections.Generic;
 
 // --------------------------------------------------
 // 
-// Script de gestion, gère les pools des tours
+// Script de gestion, gère les pools des projectiles
 // 
 // --------------------------------------------------
 public class AmmoPoolScript : MonoBehaviour 

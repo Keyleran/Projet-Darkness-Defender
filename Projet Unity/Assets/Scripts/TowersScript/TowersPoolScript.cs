@@ -23,6 +23,7 @@ public class TowersPoolScript : MonoBehaviour
     [SerializeField]
     TowersScript[] _towers;
 
+
     // Renvoi une tour à chaque appel
     public TowersScript GetTower(GameObject barricade)
     {

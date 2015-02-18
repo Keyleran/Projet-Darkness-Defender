@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 // --------------------------------------------------
 // 
-// Script ajoutant des champs aux Tours "Shooter"
+// Tower 1 - Shooter
 // 
 // --------------------------------------------------
 public class ShooterScript : MonoBehaviour 
@@ -63,9 +63,9 @@ public class ShooterScript : MonoBehaviour
 
             ps.gameObject.SetActive(true);
 
-            ps.Transform.position = _transform.position;
+            ps.Transform.position = _transform.position + new Vector3(0,2,0);
 
-            ps.Rigidbody.velocity = (_enemiesTransform[0].position - _transform.position).normalized * _projectileSpeed;
+            ps.Rigidbody.velocity = (_enemiesTransform[0].position - ps.Transform.position).normalized * _projectileSpeed;
 
             yield return new WaitForSeconds(_shootDelay);
         }

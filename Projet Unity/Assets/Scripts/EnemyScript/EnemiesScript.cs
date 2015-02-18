@@ -1,20 +1,19 @@
 ﻿// --------------------------------------------------
 // Project: Darkness Defender
-// Script: AmmoScript.cs
+// Script: EnemiesScript.cs
 // Author: Kevin Rey 3A 3DJV
 // --------------------------------------------------
 
 // Library
 using UnityEngine;
 using System.Collections;
-using System.Collections.Generic;
 
 // --------------------------------------------------
 // 
-// Script des projectiles de la tour Shooter
+// Script Coordonées unités
 // 
 // --------------------------------------------------
-public class AmmoScript : MonoBehaviour 
+public class EnemiesScript : MonoBehaviour 
 {
     public int id = 0;
 
@@ -24,9 +23,6 @@ public class AmmoScript : MonoBehaviour
     [SerializeField]
     Rigidbody _rigidbody;
 
-    [SerializeField]
-    public int damage;
-    
     // Champs permettant de placer une barricade
     public Transform Transform
     {
