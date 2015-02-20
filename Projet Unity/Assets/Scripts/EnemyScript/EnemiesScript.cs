@@ -23,6 +23,7 @@ public class EnemiesScript : MonoBehaviour
     [SerializeField]
     Rigidbody _rigidbody;
 
+    // Champs permettant de placer une barricade
     public Transform Transform
     {
         get
@@ -35,6 +36,7 @@ public class EnemiesScript : MonoBehaviour
         }
     }
 
+    // Champs permettant d'appliquer de la physique
     public Rigidbody Rigidbody
     {
         get
@@ -45,5 +47,26 @@ public class EnemiesScript : MonoBehaviour
         {
             _rigidbody = value;
         }
+    }
+
+    [SerializeField]
+    NavMeshAgent _agent;
+
+    private GameObject player;
+    private Transform lastPosition;
+
+    void Start()
+    {
+        player = GameObject.FindGameObjectWithTag("Player");
+
+        if (!player)
+        {
+            Debug.Log("Make sure your player is tagged!!");
+        }
+    }
+
+    void Update()
+    {
+        _agent.SetDestination(player.transform.position);
     }
 }
