@@ -1,4 +1,11 @@
-﻿using UnityEngine;
+﻿// --------------------------------------------------
+// Project: Darkness Defender
+// Script: LoadGame.cs
+// Author: Théo Couvert 3A 3DJV
+// --------------------------------------------------
+
+// Library
+using UnityEngine;
 using System.Collections;
 
 public class LoadGame : MonoBehaviour {
