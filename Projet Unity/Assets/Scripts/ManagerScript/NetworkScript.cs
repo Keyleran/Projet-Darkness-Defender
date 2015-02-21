@@ -30,6 +30,7 @@ public class NetworkScript : MonoBehaviour
         set { _isServer = value; }
     }
 
+
     [SerializeField]
     private int _nbPlayer = 0;
     public int NbPlayer

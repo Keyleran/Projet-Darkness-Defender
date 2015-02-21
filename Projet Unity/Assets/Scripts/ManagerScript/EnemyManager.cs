@@ -16,6 +16,21 @@ using System.Collections;
 public class EnemyManager : MonoBehaviour 
 {
     [SerializeField]
-    EnemyPoolScript _SoldiersPool;
+    Transform[] _spawners;
+
+    [SerializeField]
+    EnemyPoolScript _soldiersPool;
+
+    public IEnumerator spawnSoldiers(int Number, int idSpawner)
+    {
+        for(int i = 0 ; i < Number ; i++)
+        {
+            print(i);
+            EnemiesScript soldier = _soldiersPool.GetEnemy();
+            soldier.transform.position = _spawners[idSpawner].position;
+            yield return new WaitForSeconds(1);
+        }
+    }
+
 
 }

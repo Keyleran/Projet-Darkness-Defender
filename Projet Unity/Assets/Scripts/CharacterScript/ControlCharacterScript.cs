@@ -63,9 +63,6 @@ public class ControlCharacterScript : MonoBehaviour
     // Se déclenche dès que le personnage touche un autre objet
     void OnCollisionEnter(Collision collision)
     {
-        if ((collision.gameObject.tag == "Ground")||(collision.gameObject.tag == "Barricade"))
-        {
-            isJumping = false;
-        }
+        isJumping = false;
     }
 }

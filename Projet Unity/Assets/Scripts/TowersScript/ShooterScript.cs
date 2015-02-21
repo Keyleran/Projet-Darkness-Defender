@@ -65,9 +65,19 @@ public class ShooterScript : MonoBehaviour
 
             ps.Transform.position = _transform.position + new Vector3(0,2,0);
 
-            ps.Rigidbody.velocity = (_enemiesTransform[0].position - ps.Transform.position).normalized * _projectileSpeed;
+            // TEMPORAIRE !!!
+            if (_enemiesTransform.Count == 0)
+                StopCoroutine("TryToShoot");
+            else if (_enemiesTransform[0].position == new Vector3(-53, 1, 36))
+                _enemiesTransform.Remove(_enemiesTransform[0]);
+            else
+            {
+                ps.Rigidbody.velocity = (_enemiesTransform[0].position - ps.Transform.position).normalized * _projectileSpeed;
 
-            yield return new WaitForSeconds(_shootDelay);
+                yield return new WaitForSeconds(_shootDelay);
+            }
+
+            //---------------
         }
     }
 }
