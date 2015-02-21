@@ -6,6 +6,7 @@
 
 // Library
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 // --------------------------------------------------
@@ -23,6 +24,9 @@ public class EnemyManager : MonoBehaviour
 
     [SerializeField]
     TowerManagerScript _manager;
+
+    [SerializeField]
+    Text _uiEnemies;
 
     public IEnumerator LaunchGame()
     {
@@ -54,9 +58,15 @@ public class EnemyManager : MonoBehaviour
     {
         while (_soldiersPool.countEnemiesUse != 0) 
         {
+            if (_soldiersPool.countEnemiesUse == 1)
+                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
+            else
+                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
+
             yield return new WaitForSeconds(1);
         }
-        _manager.BuildingMoney += nbUnit * 15;
+        _uiEnemies.text = "Ennemi: 0";
+        _manager.AddBuildingMoney(nbUnit * 15);
         yield return new WaitForSeconds(10);
     }
 

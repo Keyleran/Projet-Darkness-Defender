@@ -6,6 +6,7 @@
 
 // Library
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 
 // Define
@@ -35,6 +36,9 @@ public class TowerManagerScript : MonoBehaviour
         get { return buildingMoney; }
         set { buildingMoney = value; }
     }
+
+    [SerializeField]
+    Text _buildingMoney; 
 
     #region [SerializeField] des differents poolScripts
     [SerializeField]
@@ -206,7 +210,7 @@ public class TowerManagerScript : MonoBehaviour
                 bar.Transform.position = new Vector3(positionX, positionY, positionZ);
                 hit.collider.tag = "GroundUse";
                 BuildingMoney -= 50;
-                print(BuildingMoney);
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
             }
             else
             {
@@ -223,7 +227,7 @@ public class TowerManagerScript : MonoBehaviour
                     {
                         tower = _shooterPoolScript.GetTower(hit.collider.gameObject);
                         BuildingMoney -= 100;
-                        print(BuildingMoney);
+                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
                     }
                     break;
                 case Constants.Canon:
@@ -267,10 +271,12 @@ public class TowerManagerScript : MonoBehaviour
             case "Barricade":
                 _barricadePoolScript.ReturnBarricade((BarricadeScript) hit.collider.gameObject.GetComponent("BarricadeScript"));
                 BuildingMoney += 50;
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
                 break;
             case "Shooter":
                 _shooterPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
                 BuildingMoney += 100;
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
                 break;
             case "Canon":
                 _canonPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
@@ -291,5 +297,11 @@ public class TowerManagerScript : MonoBehaviour
                 _detectorPoolScript.ReturnTower((TowersScript)hit.collider.gameObject.GetComponent("TowersScript"));
                 break;
         }
+    }
+
+    public void AddBuildingMoney(int add)
+    {
+        BuildingMoney += add;
+        _buildingMoney.text = "Matériaux: " + BuildingMoney;
     }
 }
