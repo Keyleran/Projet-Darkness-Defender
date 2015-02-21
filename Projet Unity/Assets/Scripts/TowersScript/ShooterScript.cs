@@ -68,7 +68,7 @@ public class ShooterScript : MonoBehaviour
             // TEMPORAIRE !!!
             if (_enemiesTransform.Count == 0)
                 StopCoroutine("TryToShoot");
-            else if (_enemiesTransform[0].position == new Vector3(-53, 1, 36))
+            else if (_enemiesTransform[0].position == new Vector3(0, -5, 0))
                 _enemiesTransform.Remove(_enemiesTransform[0]);
             else
             {

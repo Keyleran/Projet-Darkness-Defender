@@ -58,11 +58,6 @@ public class EnemiesScript : MonoBehaviour
     void Start()
     {
         player = GameObject.FindGameObjectWithTag("Player");
-
-        if (!player)
-        {
-            Debug.Log("Make sure your player is tagged!!");
-        }
     }
 
     void Update()

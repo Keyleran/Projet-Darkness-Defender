@@ -23,9 +23,12 @@ public class EnemyPoolScript : MonoBehaviour {
     [SerializeField]
     EnemiesScript[] _enemies;
 
+    public int countEnemiesUse = 0;
+
     // Renvoi une tour à chaque appel
     public EnemiesScript GetEnemy()
     {
+        countEnemiesUse++;
         if ((idEnemiesUnset.Count != 0) || (index < _enemies.Length))
         {
             EnemiesScript enemy = null;
@@ -41,7 +44,6 @@ public class EnemyPoolScript : MonoBehaviour {
                 enemy.id = index;
                 index++;
             }
-            enemy.gameObject.SetActive(true);
             return enemy;
         }
 
@@ -51,6 +53,7 @@ public class EnemyPoolScript : MonoBehaviour {
 
     public void ReturnEnemy(EnemiesScript enemy)
     {
+        countEnemiesUse--;
         enemy.Transform.position = this.transform.position;
         idEnemiesUnset.Add(enemy.id);
         enemy.gameObject.SetActive(false);

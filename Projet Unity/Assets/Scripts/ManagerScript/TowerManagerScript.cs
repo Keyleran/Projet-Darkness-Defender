@@ -27,8 +27,14 @@ static class Constants
 // --------------------------------------------------
 public class TowerManagerScript : MonoBehaviour
 {
-    private bool constructMode = false;
+    private bool constructMode   = false;
     private int  constructChoose = 0;
+    private int buildingMoney = 600;
+    public int BuildingMoney
+    {
+        get { return buildingMoney; }
+        set { buildingMoney = value; }
+    }
 
     #region [SerializeField] des differents poolScripts
     [SerializeField]
@@ -195,10 +201,12 @@ public class TowerManagerScript : MonoBehaviour
         if ((hit.collider.tag == "Ground") && (constructChoose == 0))
         {
             BarricadeScript bar = _barricadePoolScript.GetBarricade(hit.collider.gameObject);
-            if (bar != null)
+            if ((bar != null)&&(BuildingMoney - 50 >= 0))
             {
                 bar.Transform.position = new Vector3(positionX, positionY, positionZ);
                 hit.collider.tag = "GroundUse";
+                BuildingMoney -= 50;
+                print(BuildingMoney);
             }
             else
             {
@@ -211,7 +219,12 @@ public class TowerManagerScript : MonoBehaviour
             switch(constructChoose)
             {
                 case Constants.Shooter:
-                    tower = _shooterPoolScript.GetTower(hit.collider.gameObject);
+                    if (BuildingMoney - 100 >= 0)
+                    {
+                        tower = _shooterPoolScript.GetTower(hit.collider.gameObject);
+                        BuildingMoney -= 100;
+                        print(BuildingMoney);
+                    }
                     break;
                 case Constants.Canon:
                     tower = _canonPoolScript.GetTower(hit.collider.gameObject);
@@ -240,7 +253,7 @@ public class TowerManagerScript : MonoBehaviour
             }
             else
             {
-                print("Tower Limit Reach");
+                print("Tower Limit Reach or not enough money");
             }
         }
     }
@@ -253,9 +266,11 @@ public class TowerManagerScript : MonoBehaviour
         {
             case "Barricade":
                 _barricadePoolScript.ReturnBarricade((BarricadeScript) hit.collider.gameObject.GetComponent("BarricadeScript"));
+                BuildingMoney += 50;
                 break;
             case "Shooter":
                 _shooterPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
+                BuildingMoney += 100;
                 break;
             case "Canon":
                 _canonPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));

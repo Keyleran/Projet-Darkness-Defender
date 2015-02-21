@@ -21,16 +21,26 @@ public class SoldierScript : MonoBehaviour
     [SerializeField]
     EnemyPoolScript poolRappel;
 
+    private bool raz = true;
+    private int actualHealth;
+    void FixedUpdate()
+    {
+        if(raz)
+        {
+            actualHealth = health;
+            raz = false;
+        }
+    }
     IEnumerator OnTriggerEnter(Collider _EnCol)
     {
         if (_EnCol.tag == "Projectile")
         {
             yield return new WaitForFixedUpdate();
             AmmoScript projectile = (AmmoScript) _EnCol.gameObject.GetComponent("AmmoScript");
-            health -= projectile.damage;
+            actualHealth -= projectile.damage;
         }
 
-        if (health == 0)
+        if (actualHealth == 0)
             killEnemy();
     }
 
@@ -38,5 +48,6 @@ public class SoldierScript : MonoBehaviour
     {
         EnemiesScript enemy = (EnemiesScript)this.gameObject.GetComponent("EnemiesScript");
         poolRappel.ReturnEnemy(enemy);
+        raz = true;
     }
 }

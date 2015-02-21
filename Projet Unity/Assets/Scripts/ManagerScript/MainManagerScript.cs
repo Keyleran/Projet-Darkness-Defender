@@ -24,15 +24,7 @@ public class MainManagerScript : MonoBehaviour
         if ((levelStart == false) && (Input.GetKeyDown(KeyCode.G)))
         {
             levelStart = true;
-            LaunchGame();
+            StartCoroutine(_enemyCreator.LaunchGame());
         }
-    }
-
-    void LaunchGame()
-    {
-        print("Launch Game");
-        StartCoroutine(_enemyCreator.spawnSoldiers(10, 0));
-
-
     }
 }
