@@ -1,20 +1,21 @@
 ﻿// --------------------------------------------------
 // Project: Darkness Defender
-// Script: LoadGame.cs
+// Script: ServerScript.cs
 // Author: Théo Couvert 3A 3DJV
 // --------------------------------------------------
 
 // Library
 using UnityEngine;
 using System.Collections;
+using System.Net;
 
 public class ServerScript : MonoBehaviour
 {
 	private const string typeName = "DarknessDefender";
-	private const string gameName = "Room de Test";
+	private string gameName = "Partie de test";
 
-	private string gameType;
-	private string difficulty = null;
+	private string gameType = "";
+	private string difficulty = "";
 	
 	private bool isRefreshing = false;
 	private HostData[] hostList;
@@ -24,13 +25,19 @@ public class ServerScript : MonoBehaviour
 
 	[SerializeField]
 	GameObject _destination;
+
+	[SerializeField]
+	GameObject _name;
 	
 	void OnGUI()
 	{
 		if (!Network.isClient && !Network.isServer)
 		{
 			if (GUI.Button(new Rect(70, 100, 150, 80), "Démarrer un serveur"))
-				StartServer();
+			{
+				_name.SetActive(true);
+				this.gameObject.SetActive(false);
+			}
 			
 			if (GUI.Button(new Rect(70, 200, 150, 80), "Rafraichir"))
 				RefreshHostList();
@@ -53,8 +60,10 @@ public class ServerScript : MonoBehaviour
 
 	private void StartServer()
 	{
-		Network.InitializeServer(2, 6500, !Network.HavePublicAddress());
-		MasterServer.RegisterHost(typeName, gameName, gameType + difficulty);
+		Network.InitializeServer (2, 6500, !Network.HavePublicAddress ());
+		string name = gameName + " / " + gameType + " / " + difficulty;
+		MasterServer.RegisterHost (typeName, name);
+		Debug.Log(name);
 		_destination.gameObject.SetActive (true);
 	}
 	
@@ -91,7 +100,12 @@ public class ServerScript : MonoBehaviour
 	public void Difficulty(string chosenDifficulty)
 	{
 		difficulty = chosenDifficulty;
-		Debug.Log(difficulty);
+	}
+
+	public void SetName(string name)
+	{
+		gameName = name;
+		StartServer();
 	}
 
 	private void JoinServer(HostData hostData)
