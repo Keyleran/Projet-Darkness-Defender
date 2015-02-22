@@ -57,7 +57,7 @@ public class ControlCharacterScript : MonoBehaviour
             Vector3 actualVel = _rigibodyPlayer.velocity;
             Vector3 WantedVel = (direction - actualVel);
             _rigibodyPlayer.AddForce(WantedVel, ForceMode.VelocityChange);
-
+             
             // Si le joueur appui sur la touche "jump", "space" par defaut
             if ((isJumping == false) && Input.GetButton("Jump"))
             {
