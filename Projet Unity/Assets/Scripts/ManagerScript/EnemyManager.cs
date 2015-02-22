@@ -76,7 +76,18 @@ public class EnemyManager : MonoBehaviour
         }
         _uiEnemies.text = "Ennemi: 0";
         _manager.AddBuildingMoney(nbUnit * 15);
-        yield return new WaitForSeconds(10);
+        yield return new WaitForSeconds(5);
+        _message.text = "5";
+        yield return new WaitForSeconds(1);
+        _message.text = "4";
+        yield return new WaitForSeconds(1);
+        _message.text = "3";
+        yield return new WaitForSeconds(1);
+        _message.text = "2";
+        yield return new WaitForSeconds(1);
+        _message.text = "1";
+        yield return new WaitForSeconds(1);
+        _message.text = "";
     }
 
 }

@@ -26,6 +26,9 @@ public class ControlCharacterScript : MonoBehaviour
     [SerializeField]
     Rigidbody _rigibodyPlayer = new Rigidbody();
 
+    [SerializeField]
+    Animator _walk;
+
     // Parametres personnages
     private float speed      = 10.0f; // Vitesse de deplacement
     private float gravity    = 9.81f; // Gravité terrestre 9.81 m/s²
@@ -36,12 +39,17 @@ public class ControlCharacterScript : MonoBehaviour
     void FixedUpdate()
     {
         Vector3 direction = new Vector3(0, 0, 0);
-
+        
         if (isJumping == false) // Bloque le controle du personnage pendant le saut
         {
             // Dans InputManager, recupere les etats de l'axe "Horizontal" (touches 'q' ou 'd') et de l'axe "Horizontal" (touches 'z' ou 's')
             // En fonction des états de Z,Q,S,D, on créé une direction
             direction = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+
+            if ((Input.GetAxis("Horizontal") > 0)||(Input.GetAxis("Vertical") >0))
+                _walk.SetBool("Walk", true);
+            else
+                _walk.SetBool("Walk", false);
 
             direction = transform.TransformDirection(direction) * speed;
 

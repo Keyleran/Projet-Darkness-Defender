@@ -30,6 +30,11 @@ public class MainManagerScript : MonoBehaviour
             levelStart = true;
             _message.text = "";
             StartCoroutine(_enemyCreator.LaunchGame());
+        } 
+
+        if(Input.GetKeyDown(KeyCode.Escape))
+        {
+            Application.LoadLevel("Menu");
         }
     }
 }

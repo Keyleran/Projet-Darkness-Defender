@@ -1,6 +1,6 @@
 ﻿// --------------------------------------------------
 // Project: Darkness Defender
-// Script: PlayerManagerScript.cs
+// Script: PlayerScript.cs
 // Author: Kevin Rey 3A 3DJV
 // --------------------------------------------------
 
@@ -37,6 +37,7 @@ public class PlayerScript : MonoBehaviour
 
     [SerializeField]
     Text _message;
+
 
     void Start()
     {

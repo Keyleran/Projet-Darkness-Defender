@@ -52,6 +52,9 @@ public class EnemiesScript : MonoBehaviour
     [SerializeField]
     NavMeshAgent _agent;
 
+    [SerializeField]
+    Animator _Move;
+
     private GameObject player;
     private PlayerScript playerScript;
     private Transform lastPosition;
@@ -60,6 +63,7 @@ public class EnemiesScript : MonoBehaviour
     {
         player       = GameObject.FindGameObjectWithTag("Player");
         playerScript = (PlayerScript) player.GetComponent("PlayerScript");
+        _Move.SetBool("Walk", true); 
     }
 
     void Update()
