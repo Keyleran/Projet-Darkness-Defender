@@ -10,13 +10,13 @@ using System.Collections;
 
 public class ServerScript : MonoBehaviour
 {
-	private const string typeName = "Partie de test";
+	private const string typeName = "DarknessDefender";
 	private const string gameName = "Room de Test";
 
 	private string gameType;
 	private string difficulty = null;
 	
-	private bool isRefreshingHostList = false;
+	private bool isRefreshing = false;
 	private HostData[] hostList;
 
 	[SerializeField]
@@ -61,24 +61,23 @@ public class ServerScript : MonoBehaviour
 	void OnServerInitialized()
 	{
 		Debug.Log("Server Initializied");
-		//SpawnPlayer();
 	}
 	
 	
 	void Update()
 	{
-		if (isRefreshingHostList && MasterServer.PollHostList().Length > 0)
+		if (isRefreshing && MasterServer.PollHostList().Length > 0)
 		{
-			isRefreshingHostList = false;
+			isRefreshing = false;
 			hostList = MasterServer.PollHostList();
 		}
 	}
 	
 	private void RefreshHostList()
 	{
-		if (!isRefreshingHostList)
+		if (!isRefreshing)
 		{
-			isRefreshingHostList = true;
+			isRefreshing = true;
 			MasterServer.RequestHostList(typeName);
 		}
 	}
@@ -92,7 +91,7 @@ public class ServerScript : MonoBehaviour
 	public void Difficulty(string chosenDifficulty)
 	{
 		difficulty = chosenDifficulty;
-		Debug.Log(gameType);
+		Debug.Log(difficulty);
 	}
 
 	private void JoinServer(HostData hostData)
