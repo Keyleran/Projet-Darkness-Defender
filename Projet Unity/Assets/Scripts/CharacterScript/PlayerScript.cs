@@ -6,7 +6,9 @@
 
 // Library
 using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 // --------------------------------------------------
 // 
@@ -17,34 +19,43 @@ public class PlayerScript : MonoBehaviour
 {
     public int playerId = 0;
 
-    [SerializeField]
-    Transform _transform;
-
-    [SerializeField]
-    Rigidbody _rigidbody;
-
-    public Transform Transform
+    public float Health
     {
-        get
-        {
-            return _transform;
-        }
-        set
-        {
-            _transform = value;
-        }
+        get { return health; }
+        set { health = value; }
     }
 
-    public Rigidbody Rigidbody
+    public  float InitialHealth;
+    private float health;
+    private float AncientHealth;
+
+    [SerializeField]
+    Scrollbar _healthBar;
+
+    [SerializeField]
+    Text _health;
+
+    [SerializeField]
+    Text _message;
+
+    void Start()
     {
-        get
+        health = InitialHealth;
+        AncientHealth = InitialHealth;
+    }
+    void FixedUpdate()
+    {
+        if(Health != AncientHealth)
         {
-            return _rigidbody;
-        }
-        set
-        {
-            _rigidbody = value;
+            AncientHealth = Health;
+            _healthBar.size = Health / InitialHealth;
+            _health.text = Health.ToString() + " / " + InitialHealth.ToString();
+
+            if (Health == 0)
+            {
+                // GameOver
+                _message.text = "Game Over";
+            }
         }
     }
-	
 }

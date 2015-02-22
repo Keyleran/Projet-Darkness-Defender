@@ -26,7 +26,7 @@ public class PlayerManagerScript : MonoBehaviour
     // Renvoi une tour à chaque appel
     public PlayerScript SpawnPlayer()
     {
-        _players[index].Transform.position = _spawnPlayer.position;
+        _players[index].transform.position = _spawnPlayer.position;
         _players[index].playerId = index;
         index++;
 

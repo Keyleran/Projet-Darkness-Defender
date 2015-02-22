@@ -28,6 +28,9 @@ public class EnemyManager : MonoBehaviour
     [SerializeField]
     Text _uiEnemies;
 
+    [SerializeField]
+    Text _message;
+
     public IEnumerator LaunchGame()
     {
         print("Launch Game");
@@ -41,6 +44,7 @@ public class EnemyManager : MonoBehaviour
         StartCoroutine(spawnSoldiers(16, 0));
         yield return StartCoroutine(spawnSoldiers(16, 1));
         yield return StartCoroutine(transition(32));
+        _message.text = "Victoire !";
     }
      
     public IEnumerator spawnSoldiers(int Number, int idSpawner)
@@ -51,6 +55,11 @@ public class EnemyManager : MonoBehaviour
             soldier.transform.position = _spawners[idSpawner].position;
             soldier.gameObject.SetActive(true);
             yield return new WaitForSeconds(1);
+
+            if (_soldiersPool.countEnemiesUse == 1)
+                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
+            else
+                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
         }
     } 
 
@@ -59,9 +68,9 @@ public class EnemyManager : MonoBehaviour
         while (_soldiersPool.countEnemiesUse != 0) 
         {
             if (_soldiersPool.countEnemiesUse == 1)
-                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
-            else
                 _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
+            else
+                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
 
             yield return new WaitForSeconds(1);
         }

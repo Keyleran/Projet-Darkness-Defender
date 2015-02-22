@@ -53,15 +53,42 @@ public class EnemiesScript : MonoBehaviour
     NavMeshAgent _agent;
 
     private GameObject player;
+    private PlayerScript playerScript;
     private Transform lastPosition;
 
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player");
+        player       = GameObject.FindGameObjectWithTag("Player");
+        playerScript = (PlayerScript) player.GetComponent("PlayerScript");
     }
 
     void Update()
     {
         _agent.SetDestination(player.transform.position);
+    }
+
+    void OnTriggerEnter(Collider col)
+    {
+        if (col.tag == "Player")
+        {
+            StartCoroutine("TakeDamage");
+        }
+    }
+
+    void OnTriggerExit(Collider col)
+    {
+        if (col.tag == "Player")
+        {
+            StopCoroutine("TakeDamage");
+        }
+    }
+
+    IEnumerator TakeDamage()
+    {
+        while(true)
+        {
+            yield return new WaitForSeconds(1);
+            playerScript.Health -= 2;
+        }
     }
 }

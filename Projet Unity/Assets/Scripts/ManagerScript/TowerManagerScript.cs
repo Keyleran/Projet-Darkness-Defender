@@ -38,7 +38,11 @@ public class TowerManagerScript : MonoBehaviour
     }
 
     [SerializeField]
-    Text _buildingMoney; 
+    Text _buildingMoney;
+
+    [SerializeField]
+    Image[] _towers;
+
 
     #region [SerializeField] des differents poolScripts
     [SerializeField]
@@ -140,56 +144,82 @@ public class TowerManagerScript : MonoBehaviour
         {
             _samplesPoolScript.ReturnSample();
             constructMode = !constructMode;
+            RazUITowers();
+            _towers[0].color = new Color(0, 180, 0);
+            constructChoose = 0;
         }
 
         // Choix de la tour à construire
         #region Choix de la tour à construire
-        if (Input.GetButtonDown("SelectBarricade"))
+        if (constructMode)
         {
-            _samplesPoolScript.ReturnSample();
-            constructChoose = 0;
-        }
+            if (Input.GetButtonDown("SelectBarricade"))
+            {
+                RazUITowers();
+                _samplesPoolScript.ReturnSample();
+                _towers[0].color = new Color(0, 180, 0);
+                constructChoose = 0;
+            }
 
-        if (Input.GetButtonDown("SelectShooter"))
-        {
-            _samplesPoolScript.ReturnSample();
-            constructChoose = 1;
-        }
+            if (Input.GetButtonDown("SelectShooter"))
+            {
+                RazUITowers();
+                _samplesPoolScript.ReturnSample();
+                _towers[1].color = new Color(0, 180, 0);
+                constructChoose = 1;
+            }
+            /*
+            if (Input.GetButtonDown("SelectCanon"))
+            {
+                RazUITowers();
+                _samplesPoolScript.ReturnSample();
+                //_towers[2].color = new Color(0, 180, 0);
+                constructChoose = 2;
+            }
 
-        if (Input.GetButtonDown("SelectCanon"))
-        {
-            _samplesPoolScript.ReturnSample();
-            constructChoose = 2;
-        }
+            if (Input.GetButtonDown("SelectFire"))
+            {
+                RazUITowers();
+                _samplesPoolScript.ReturnSample();
+                //_towers[3].color = new Color(0, 180, 0);
+                constructChoose = 3;
+            }
 
-        if (Input.GetButtonDown("SelectFire"))
-        {
-            _samplesPoolScript.ReturnSample();
-            constructChoose = 3;
-        }
+            if (Input.GetButtonDown("SelectIce"))
+            {
+                RazUITowers();
+                _samplesPoolScript.ReturnSample();
+                //_towers[4].color = new Color(0, 180, 0);
+                constructChoose = 4;
+            }
 
-        if (Input.GetButtonDown("SelectIce"))
-        {
-            _samplesPoolScript.ReturnSample();
-            constructChoose = 4;
-        }
+            if (Input.GetButtonDown("SelectPoison"))
+            {
+                RazUITowers();
+                _samplesPoolScript.ReturnSample();
+                //_towers[5].color = new Color(0, 180, 0);
+                constructChoose = 5;
+            }
 
-        if (Input.GetButtonDown("SelectPoison"))
-        {
-            _samplesPoolScript.ReturnSample();
-            constructChoose = 5;
-        }
+            if (Input.GetButtonDown("SelectMagic"))
+            {
+                RazUITowers();
+                _samplesPoolScript.ReturnSample();
+                //_towers[6].color = new Color(0, 180, 0);
+                constructChoose = 6;
+            }
 
-        if (Input.GetButtonDown("SelectMagic"))
-        {
-            _samplesPoolScript.ReturnSample();
-            constructChoose = 6;
+            if (Input.GetButtonDown("SelectDetector"))
+            {
+                RazUITowers();
+                _samplesPoolScript.ReturnSample();
+                //_towers[7].color = new Color(0, 180, 0);
+                constructChoose = 7;
+            }*/
         }
-
-        if (Input.GetButtonDown("SelectDetector"))
+        else
         {
-            _samplesPoolScript.ReturnSample();
-            constructChoose = 7;
+            RazUITowers();
         }
         #endregion
     }
@@ -231,22 +261,52 @@ public class TowerManagerScript : MonoBehaviour
                     }
                     break;
                 case Constants.Canon:
-                    tower = _canonPoolScript.GetTower(hit.collider.gameObject);
+                    if (BuildingMoney - 150 >= 0)
+                    {
+                        tower = _canonPoolScript.GetTower(hit.collider.gameObject);
+                        BuildingMoney -= 150;
+                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                    }
                     break;
                 case Constants.Fire:
-                    tower = _firePoolScript.GetTower(hit.collider.gameObject);
+                    if (BuildingMoney - 200 >= 0)
+                    {
+                        tower = _firePoolScript.GetTower(hit.collider.gameObject);
+                        BuildingMoney -= 200;
+                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                    }
                     break;
                 case Constants.Ice:
-                    tower = _icePoolScript.GetTower(hit.collider.gameObject);
+                    if (BuildingMoney - 100 >= 0)
+                    {
+                        tower = _icePoolScript.GetTower(hit.collider.gameObject);
+                        BuildingMoney -= 100;
+                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                    }
                     break;
                 case Constants.Poison:
-                    tower = _poisonPoolScript.GetTower(hit.collider.gameObject);
+                    if (BuildingMoney - 100 >= 0)
+                    {
+                        tower = _poisonPoolScript.GetTower(hit.collider.gameObject);
+                        BuildingMoney -= 100;
+                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                    }
                     break;
                 case Constants.Magic:
-                    tower = _magicPoolScript.GetTower(hit.collider.gameObject);
+                    if (BuildingMoney - 200 >= 0)
+                    {
+                        tower = _magicPoolScript.GetTower(hit.collider.gameObject);
+                        BuildingMoney -= 200;
+                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                    }
                     break;
                 case Constants.Detector:
-                    tower = _detectorPoolScript.GetTower(hit.collider.gameObject);
+                    if (BuildingMoney - 150 >= 0)
+                    {
+                        tower = _detectorPoolScript.GetTower(hit.collider.gameObject);
+                        BuildingMoney -= 150;
+                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                    }
                     break;
             }
 
@@ -280,21 +340,33 @@ public class TowerManagerScript : MonoBehaviour
                 break;
             case "Canon":
                 _canonPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
+                BuildingMoney += 150;
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
                 break;
             case "Fire":
                 _firePoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
+                BuildingMoney += 200;
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
                 break;
             case "Ice":
                 _icePoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
+                BuildingMoney += 100;
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
                 break;
             case "Poison":
                 _poisonPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
+                BuildingMoney += 100;
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
                 break;
             case "Magic":
                 _magicPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
+                BuildingMoney += 200;
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
                 break;
             case "Detector":
                 _detectorPoolScript.ReturnTower((TowersScript)hit.collider.gameObject.GetComponent("TowersScript"));
+                BuildingMoney += 150;
+                _buildingMoney.text = "Matériaux: " + BuildingMoney;
                 break;
         }
     }
@@ -303,5 +375,21 @@ public class TowerManagerScript : MonoBehaviour
     {
         BuildingMoney += add;
         _buildingMoney.text = "Matériaux: " + BuildingMoney;
+    }
+
+    void RazUITowers()
+    {
+        /*
+        for (int i = 0; i < 7; i++)
+            _towers[i].color = new Color(255, 255, 255);*/
+
+        _towers[0].color = new Color(255, 255, 255);
+        _towers[1].color = new Color(255, 255, 255);
+        _towers[2].color = new Color(180, 0, 0);
+        _towers[3].color = new Color(180, 0, 0);
+        _towers[4].color = new Color(180, 0, 0);
+        _towers[5].color = new Color(180, 0, 0);
+        _towers[6].color = new Color(180, 0, 0);
+        _towers[7].color = new Color(180, 0, 0);
     }
 }
