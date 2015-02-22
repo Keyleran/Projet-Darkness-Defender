@@ -43,7 +43,17 @@ public class EnemyManager : MonoBehaviour
         yield return StartCoroutine(transition(16));
         StartCoroutine(spawnSoldiers(16, 0));
         yield return StartCoroutine(spawnSoldiers(16, 1));
-        yield return StartCoroutine(transition(32));
+
+        // Fin du niveau
+        while (_soldiersPool.countEnemiesUse != 0)
+        {
+            if (_soldiersPool.countEnemiesUse == 1)
+                _uiEnemies.text = "Enemi: " + _soldiersPool.countEnemiesUse;
+            else
+                _uiEnemies.text = "Enemis: " + _soldiersPool.countEnemiesUse;
+
+            yield return new WaitForSeconds(1);
+        }
         _message.text = "Victoire !";
     }
      
@@ -57,9 +67,9 @@ public class EnemyManager : MonoBehaviour
             yield return new WaitForSeconds(1);
 
             if (_soldiersPool.countEnemiesUse == 1)
-                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Enemi: " + _soldiersPool.countEnemiesUse;
             else
-                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Enemis: " + _soldiersPool.countEnemiesUse;
         }
     } 
 
@@ -68,13 +78,13 @@ public class EnemyManager : MonoBehaviour
         while (_soldiersPool.countEnemiesUse != 0) 
         {
             if (_soldiersPool.countEnemiesUse == 1)
-                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Enemi: " + _soldiersPool.countEnemiesUse;
             else
-                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Enemis: " + _soldiersPool.countEnemiesUse;
 
             yield return new WaitForSeconds(1);
         }
-        _uiEnemies.text = "Ennemi: 0";
+        _uiEnemies.text = "Enemi: 0";
         _manager.AddBuildingMoney(nbUnit * 15);
         yield return new WaitForSeconds(5);
         _message.text = "5";
