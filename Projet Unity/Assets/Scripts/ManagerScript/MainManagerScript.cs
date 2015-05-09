@@ -34,7 +34,8 @@ public class MainManagerScript : MonoBehaviour
     //private bool levelStart = false;
     void Start()
     {
-        Screen.lockCursor = true;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
         StartCoroutine(InitiateGame());
     }
 
@@ -42,7 +43,8 @@ public class MainManagerScript : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Screen.lockCursor = false;
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
             Application.LoadLevel("Menu");
         }
     }

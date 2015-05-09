@@ -30,7 +30,7 @@ public class TowerManagerScript : MonoBehaviour
 {
     private bool constructMode   = false;
     private int  constructChoose = 0;
-    private int buildingMoney = 600;
+    private int  buildingMoney   = 600;
     public int BuildingMoney
     {
         get { return buildingMoney; }

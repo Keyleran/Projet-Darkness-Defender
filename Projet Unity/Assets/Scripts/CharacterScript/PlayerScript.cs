@@ -55,8 +55,19 @@ public class PlayerScript : MonoBehaviour
             if (Health == 0)
             {
                 // GameOver
-                _message.text = "Game Over";
+                StartCoroutine("death");
             }
         }
+    }
+
+    IEnumerator death()
+    {
+        _message.text = "Game Over";
+        _message.fontSize = 30;
+        yield return new WaitForSeconds(5);
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        Application.LoadLevel("Menu");
     }
 }

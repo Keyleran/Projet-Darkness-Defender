@@ -49,11 +49,17 @@ public class AmmoPoolScript : MonoBehaviour
         return null;
     }
 
+    // ----------
+    //
+    // Fonction retour du projectile à la pool
+    //
+    // ----------
     public void ReturnProjectile(AmmoScript tower)
     {
-        tower.Transform.position = this.transform.position;
-        idProjectileUnset.Add(tower.id);
-        tower.gameObject.SetActive(false);
+        tower.Transform.position = this.transform.position; // Replace le projectile dans la pool
+        idProjectileUnset.Add(tower.id); // Retire l'objet de la liste des projectiles utilisés
+
+        tower.gameObject.SetActive(false); // Désactive le gameobject
     }
 	
 }

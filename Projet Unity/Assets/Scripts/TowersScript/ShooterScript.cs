@@ -30,14 +30,17 @@ public class ShooterScript : MonoBehaviour
 
     private List<Transform> _enemiesTransform = new List<Transform>();
 
+    private IEnumerator ShootCoroutine = null;
+
     void OnTriggerEnter(Collider col)
     {
         if(col.tag == "Enemy")
         {
             _enemiesTransform.Add(col.transform);
-            if (_enemiesTransform.Count == 1)
+            if (_enemiesTransform.Count == 1 && ShootCoroutine == null)
             {
-                StartCoroutine("TryToShoot");
+                ShootCoroutine = TryToShoot();
+                StartCoroutine(ShootCoroutine);
             }
         }
     }
@@ -47,9 +50,10 @@ public class ShooterScript : MonoBehaviour
         if (col.tag == "Enemy")
         {
             _enemiesTransform.Remove(col.transform);
-            if (_enemiesTransform.Count == 0)
+            if (_enemiesTransform.Count == 0 && ShootCoroutine != null)
             {
-                StopCoroutine("TryToShoot");
+                StopCoroutine(ShootCoroutine);
+                ShootCoroutine = null;
             }
         }
     }
@@ -59,7 +63,7 @@ public class ShooterScript : MonoBehaviour
         while (true)
         {
             yield return new WaitForFixedUpdate();
-            var ps = _ammoShooter.GetProjectile();
+            AmmoScript ps = _ammoShooter.GetProjectile();
 
             if (ps != null)
             {
@@ -69,7 +73,10 @@ public class ShooterScript : MonoBehaviour
 
                 // TEMPORAIRE !!!
                 if (_enemiesTransform.Count == 0)
-                    StopCoroutine("TryToShoot");
+                {
+                    StopCoroutine(ShootCoroutine);
+                    ShootCoroutine = null;
+                }
                 else if (_enemiesTransform[0].position == new Vector3(0, -5, 0))
                     _enemiesTransform.Remove(_enemiesTransform[0]);
                 else
@@ -80,6 +87,7 @@ public class ShooterScript : MonoBehaviour
                 }
 
                 //---------------
+
             }
         }
     }

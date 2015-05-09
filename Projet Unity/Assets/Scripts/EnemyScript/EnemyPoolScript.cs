@@ -23,7 +23,7 @@ public class EnemyPoolScript : MonoBehaviour {
     [SerializeField]
     EnemiesScript[] _enemies;
 
-    public int countEnemiesUse = 0;
+    public int countEnemiesUse = 0; // Nombre d'enemis libérés par la pool
 
     // Renvoi une tour à chaque appel
     public EnemiesScript GetEnemy()
@@ -51,11 +51,18 @@ public class EnemyPoolScript : MonoBehaviour {
         return null;
     }
 
+    // ----------
+    //
+    // Fonction retour de l'unité enemie à la pool
+    //
+    // ----------
     public void ReturnEnemy(EnemiesScript enemy)
     {
         countEnemiesUse--;
-        enemy.Transform.position = this.transform.position;
-        idEnemiesUnset.Add(enemy.id);
-        enemy.gameObject.SetActive(false);
+
+        enemy.Transform.position = this.transform.position; // Replace le projectile dans la pool
+        idEnemiesUnset.Add(enemy.id); // Retire l'objet de la liste des projectiles utilisés
+
+        enemy.gameObject.SetActive(false); // Désactive le gameobject
     }
 }
