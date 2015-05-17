@@ -41,6 +41,12 @@ public class TowerManagerScript : MonoBehaviour
     Text _buildingMoney;
 
     [SerializeField]
+    Text _ChoosenTower;
+
+    [SerializeField]
+    Image _ChoosenTowerFont;
+
+    [SerializeField]
     Image[] _towers;
 
 
@@ -88,7 +94,12 @@ public class TowerManagerScript : MonoBehaviour
     AmmoPoolScript _magicAmmoPoolScript;
     #endregion
     */
-    
+
+    void Start()
+    {
+        _ChoosenTowerFont.color = new Color(255, 255, 255, 0);
+    }
+
     void FixedUpdate()
     {
         if (constructMode)
@@ -145,6 +156,8 @@ public class TowerManagerScript : MonoBehaviour
             _samplesPoolScript.ReturnSample();
             constructMode = !constructMode;
             RazUITowers();
+            _ChoosenTower.text = "Barricade";
+            _ChoosenTowerFont.color = new Color(255, 255, 255, 0);
             _towers[0].color = new Color(0, 180, 0);
             constructChoose = 0;
         }
@@ -153,9 +166,11 @@ public class TowerManagerScript : MonoBehaviour
         #region Choix de la tour à construire
         if (constructMode)
         {
+            _ChoosenTowerFont.color = new Color(255, 255, 255, 255);
             if (Input.GetButtonDown("SelectBarricade"))
             {
                 RazUITowers();
+                _ChoosenTower.text = "Barricade";
                 _samplesPoolScript.ReturnSample();
                 _towers[0].color = new Color(0, 180, 0);
                 constructChoose = 0;
@@ -164,6 +179,7 @@ public class TowerManagerScript : MonoBehaviour
             if (Input.GetButtonDown("SelectShooter"))
             {
                 RazUITowers();
+                _ChoosenTower.text = "Tirreur";
                 _samplesPoolScript.ReturnSample();
                 _towers[1].color = new Color(0, 180, 0);
                 constructChoose = 1;
@@ -172,6 +188,7 @@ public class TowerManagerScript : MonoBehaviour
             if (Input.GetButtonDown("SelectCanon"))
             {
                 RazUITowers();
+                _ChoosenTower.text = "Canon";
                 _samplesPoolScript.ReturnSample();
                 //_towers[2].color = new Color(0, 180, 0);
                 constructChoose = 2;
@@ -180,6 +197,7 @@ public class TowerManagerScript : MonoBehaviour
             if (Input.GetButtonDown("SelectFire"))
             {
                 RazUITowers();
+                _ChoosenTower.text = "Lance-Flammes";
                 _samplesPoolScript.ReturnSample();
                 //_towers[3].color = new Color(0, 180, 0);
                 constructChoose = 3;
@@ -188,6 +206,7 @@ public class TowerManagerScript : MonoBehaviour
             if (Input.GetButtonDown("SelectIce"))
             {
                 RazUITowers();
+                _ChoosenTower.text = "Géle";
                 _samplesPoolScript.ReturnSample();
                 //_towers[4].color = new Color(0, 180, 0);
                 constructChoose = 4;
@@ -196,6 +215,7 @@ public class TowerManagerScript : MonoBehaviour
             if (Input.GetButtonDown("SelectPoison"))
             {
                 RazUITowers();
+                _ChoosenTower.text = "Poison";
                 _samplesPoolScript.ReturnSample();
                 //_towers[5].color = new Color(0, 180, 0);
                 constructChoose = 5;
@@ -204,6 +224,7 @@ public class TowerManagerScript : MonoBehaviour
             if (Input.GetButtonDown("SelectMagic"))
             {
                 RazUITowers();
+                _ChoosenTower.text = "Tour Sorcier";
                 _samplesPoolScript.ReturnSample();
                 //_towers[6].color = new Color(0, 180, 0);
                 constructChoose = 6;
@@ -212,6 +233,7 @@ public class TowerManagerScript : MonoBehaviour
             if (Input.GetButtonDown("SelectDetector"))
             {
                 RazUITowers();
+                _ChoosenTower.text = "Oeil";
                 _samplesPoolScript.ReturnSample();
                 //_towers[7].color = new Color(0, 180, 0);
                 constructChoose = 7;
@@ -383,6 +405,7 @@ public class TowerManagerScript : MonoBehaviour
         for (int i = 0; i < 7; i++)
             _towers[i].color = new Color(255, 255, 255);*/
 
+        _ChoosenTower.text = "";
         _towers[0].color = new Color(255, 255, 255);
         _towers[1].color = new Color(255, 255, 255);
         _towers[2].color = new Color(180, 0, 0);

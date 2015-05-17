@@ -30,7 +30,7 @@ public class PlayerScript : MonoBehaviour
     private float AncientHealth;
 
     [SerializeField]
-    Scrollbar _healthBar;
+    Slider _healthBar;
 
     [SerializeField]
     Text _health;
@@ -43,13 +43,13 @@ public class PlayerScript : MonoBehaviour
     {
         health = InitialHealth;
         AncientHealth = InitialHealth;
-    }
+    } 
     void FixedUpdate()
     {
         if(Health != AncientHealth)
         {
             AncientHealth = Health;
-            _healthBar.size = Health / InitialHealth;
+            _healthBar.value = 1 - (health / InitialHealth);
             _health.text = Health.ToString() + " / " + InitialHealth.ToString();
 
             if (Health == 0)
