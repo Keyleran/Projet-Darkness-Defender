@@ -48,9 +48,9 @@ public class EnemyManager : MonoBehaviour
         while (_soldiersPool.countEnemiesUse != 0)
         {
             if (_soldiersPool.countEnemiesUse == 1)
-                _uiEnemies.text = "Enemi: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
             else
-                _uiEnemies.text = "Enemis: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
 
             yield return new WaitForSeconds(1);
         }
@@ -67,9 +67,9 @@ public class EnemyManager : MonoBehaviour
             yield return new WaitForSeconds(1);
 
             if (_soldiersPool.countEnemiesUse == 1)
-                _uiEnemies.text = "Enemi: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
             else
-                _uiEnemies.text = "Enemis: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
         }
     } 
 
@@ -78,13 +78,13 @@ public class EnemyManager : MonoBehaviour
         while (_soldiersPool.countEnemiesUse != 0) 
         {
             if (_soldiersPool.countEnemiesUse == 1)
-                _uiEnemies.text = "Enemi: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
             else
-                _uiEnemies.text = "Enemis: " + _soldiersPool.countEnemiesUse;
+                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
 
             yield return new WaitForSeconds(1);
         }
-        _uiEnemies.text = "Enemi: 0";
+        _uiEnemies.text = "Ennemi: 0";
         _manager.AddBuildingMoney(nbUnit * 15);
         yield return new WaitForSeconds(5);
         _message.text = "5";

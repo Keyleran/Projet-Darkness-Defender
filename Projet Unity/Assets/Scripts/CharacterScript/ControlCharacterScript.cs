@@ -36,7 +36,7 @@ public class ControlCharacterScript : MonoBehaviour
     private float heightJump = 1.0f; // Hauteur des sauts
     private bool  isJumping  = false; // Ce booleen bloque certaines fonctionnalites pendant le saut du personnage, par exemple le deplacement
 
-
+     
     void FixedUpdate()
     {
         if (isJumping == false) // Bloque le controle du personnage pendant le saut

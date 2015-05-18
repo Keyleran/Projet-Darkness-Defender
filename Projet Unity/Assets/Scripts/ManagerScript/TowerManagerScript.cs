@@ -8,6 +8,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 using System.Collections;
+using System.Collections.Generic;
 
 // Define
 static class Constants
@@ -31,6 +32,14 @@ public class TowerManagerScript : MonoBehaviour
     private bool constructMode   = false;
     private int  constructChoose = 0;
     private int  buildingMoney   = 600;
+
+    private Dictionary<string, string> _grid;
+    private Dictionary<string, string> Grid
+    {
+        get { return _grid; }
+        set { _grid = value; }
+    }
+
     public int BuildingMoney
     {
         get { return buildingMoney; }
@@ -97,6 +106,7 @@ public class TowerManagerScript : MonoBehaviour
 
     void Start()
     {
+        Grid = new Dictionary<string, string>();
         _ChoosenTowerFont.color = new Color(255, 255, 255, 0);
     }
 
@@ -110,10 +120,8 @@ public class TowerManagerScript : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit))
             {
-                // Récupère les coordonnées de l'objet visé
-                float positionX = hit.transform.position.x;
-                float positionY = hit.transform.position.y + 0.5f;
-                float positionZ = hit.transform.position.z;
+
+                float positionX = 0, positionY = 0, positionZ = 0;
 
                 _samplesPoolScript.ReturnSample();
 
@@ -121,11 +129,20 @@ public class TowerManagerScript : MonoBehaviour
                 // Le code semble identique, mais il permet de ne pas afficher une barricade sur une autre barricade
                 if ((hit.collider.tag == "Ground") && (constructChoose == 0))
                 {
+                    // Récupère les coordonnées de l'objet visé
+                    positionX = roundNumber(hit.point.x);
+                    positionY = roundNumber(hit.point.y);
+                    positionZ = roundNumber(hit.point.z);
+
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
                     sample.Transform.position = new Vector3(positionX, positionY, positionZ);
                 }
                 else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
                 {
+                    positionX = hit.transform.position.x;
+                    positionY = hit.transform.position.y + 0.5f;
+                    positionZ = hit.transform.position.z;
+
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
                     sample.Transform.position = new Vector3(positionX, positionY, positionZ);
                 }
@@ -133,7 +150,7 @@ public class TowerManagerScript : MonoBehaviour
                 // Si le joueur clique, acheter une tour
                 if(Input.GetMouseButtonDown(0))
                 {
-                    BuyTower(hit, constructChoose);
+                    BuyTower(new Vector3(positionX, positionY, positionZ), hit, constructChoose);
                 }
             }
         }
@@ -246,21 +263,34 @@ public class TowerManagerScript : MonoBehaviour
         #endregion
     }
 
-
-
-    void BuyTower(RaycastHit hit, int constructChoose)
+    float roundNumber(float value)
     {
-        float positionX = hit.transform.position.x;
-        float positionY = hit.transform.position.y + 0.5f;
-        float positionZ = hit.transform.position.z;
+        float new_value = 0;
 
+        if(value >= 0)
+        {
+            new_value = Mathf.Ceil(value);
+            if (new_value % 2 != 0)
+                new_value--;
+        }
+        else // Value < 0
+        {
+            new_value = Mathf.Floor(value);
+            if (new_value % 2 != 0)
+                new_value++;
+        }
+
+        return new_value;
+    }
+
+    void BuyTower(Vector3 position, RaycastHit hit, int constructChoose)
+    {
         if ((hit.collider.tag == "Ground") && (constructChoose == 0))
         {
             BarricadeScript bar = _barricadePoolScript.GetBarricade(hit.collider.gameObject);
             if ((bar != null)&&(BuildingMoney - 50 >= 0))
             {
-                bar.Transform.position = new Vector3(positionX, positionY, positionZ);
-                hit.collider.tag = "GroundUse";
+                bar.Transform.position = position;
                 BuildingMoney -= 50;
                 _buildingMoney.text = "Matériaux: " + BuildingMoney;
             }
@@ -334,7 +364,7 @@ public class TowerManagerScript : MonoBehaviour
 
             if (tower != null)
             {
-                tower.Transform.position = new Vector3(positionX, positionY, positionZ);
+                tower.Transform.position = position;
                 hit.collider.tag = "BarricadeUse";
             }
             else

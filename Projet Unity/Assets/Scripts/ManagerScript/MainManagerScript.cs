@@ -22,15 +22,6 @@ public class MainManagerScript : MonoBehaviour
     [SerializeField]
     Text _message;
 
-    [SerializeField]
-    Image _enemisCpt;
-
-    [SerializeField]
-    Image _towersGui;
-
-    [SerializeField]
-    Image _buildingMoney;
-
     //private bool levelStart = false;
     void Start()
     {
@@ -89,27 +80,11 @@ public class MainManagerScript : MonoBehaviour
             yield return new WaitForSeconds(1);
             yield return StartCoroutine(WaitKeyDown(KeyCode.E));
             _message.text = "En haut à droite se trouve le compteur d'enemis, il vous indique le nombre d'enemis restant sur la carte.\n(Appuyez sur \"E\")";
-            _enemisCpt.color = new Color(0, 0, 180);
-            yield return new WaitForSeconds(1);
-            _enemisCpt.color = new Color(255, 255, 255);
-            yield return new WaitForSeconds(1);
-            _enemisCpt.color = new Color(0, 0, 180);
-            yield return new WaitForSeconds(1);
-            _enemisCpt.color = new Color(255, 255, 255);
-            yield return new WaitForSeconds(1);
             yield return StartCoroutine(WaitKeyDown(KeyCode.E));
             _message.text = "En parlant de carte, vous trouverez une mini-map en bas à droite.\n(Appuyez sur \"E\")";
             yield return new WaitForSeconds(1);
             yield return StartCoroutine(WaitKeyDown(KeyCode.E));
             _message.text = "Ce jeu est un Tower Defense !\nVous devez construire des Tours pour détruire vos enemis.\nAppuyez sur \"A\" pour passer en mode construction...";
-            _towersGui.color = new Color(0, 0, 180); 
-            yield return new WaitForSeconds(1);
-            _towersGui.color = new Color(255, 255, 255);
-            yield return new WaitForSeconds(1);
-            _towersGui.color = new Color(0, 0, 180);
-            yield return new WaitForSeconds(1);
-            _towersGui.color = new Color(255, 255, 255);
-            yield return new WaitForSeconds(1);
             yield return StartCoroutine(WaitKeyDown(KeyCode.A));
             _message.text = "Vous êtes maintenant dans le mode de contruction.\nLes cases en bas de votre écran indique les tours que vous pouvez construire.\nLa barricade est sélectionnée par défaut.\n(Appuyez sur \"E\")";
             yield return new WaitForSeconds(1);
@@ -121,14 +96,6 @@ public class MainManagerScript : MonoBehaviour
             yield return new WaitForSeconds(1);
             yield return StartCoroutine(WaitKeyDown(KeyCode.Alpha2));
             _message.text = "La construction de tour et de barricade coûte des matériaux, faites attention !\n Le nombre de matériax restant est indiqué en bas à gauche de votre écran.\n(Appuyez sur \"E\")";
-            _buildingMoney.color = new Color(0, 0, 180);
-            yield return new WaitForSeconds(1);
-            _buildingMoney.color = new Color(255, 255, 255);
-            yield return new WaitForSeconds(1);
-            _buildingMoney.color = new Color(0, 0, 180);
-            yield return new WaitForSeconds(1);
-            _buildingMoney.color = new Color(255, 255, 255);
-            yield return new WaitForSeconds(1);
             yield return StartCoroutine(WaitKeyDown(KeyCode.E));
             _message.text = "Pour le moment, vous n'avez accès qu'à 2 tours.\nUn peu de patience, les 6 autres arriveront prochainement\n(Appuyez sur \"E\")";
             yield return new WaitForSeconds(1);
