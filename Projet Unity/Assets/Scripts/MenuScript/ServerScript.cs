@@ -13,19 +13,22 @@ public class ServerScript : MonoBehaviour
 {
 	private const string typeName = "DarknessDefender";
 	private string gameName = "Partie de test";
-
+	
 	private string gameType = "";
 	private string difficulty = "";
 	
 	private bool isRefreshing = false;
 	private HostData[] hostList;
-
+	
+	[SerializeField]
+	private PlayerManagerScript _playerAccess;
+	
 	[SerializeField]
 	GameObject _parent;
-
+	
 	[SerializeField]
 	GameObject _destination;
-
+	
 	[SerializeField]
 	GameObject _name;
 	
@@ -47,7 +50,10 @@ public class ServerScript : MonoBehaviour
 				for (int i = 0; i < hostList.Length; i++)
 				{
 					if (GUI.Button(new Rect(250, 100 + (110 * i), 600, 100), hostList[i].gameName))
+					{
+						Debug.Log("ça passe ici");
 						JoinServer(hostList[i]);
+					}
 				}
 			}
 			if (GUI.Button(new Rect(500, 500, 120, 50), "Retour"))
@@ -57,13 +63,12 @@ public class ServerScript : MonoBehaviour
 			}
 		}
 	}
-
+	
 	private void StartServer()
 	{
-		Network.InitializeServer (2, 6500, !Network.HavePublicAddress ());
+		Network.InitializeServer (32, 6500, !Network.HavePublicAddress());
 		string name = gameName + " / " + gameType + " / " + difficulty;
 		MasterServer.RegisterHost (typeName, name);
-		Debug.Log(name);
 		_destination.gameObject.SetActive (true);
 	}
 	
@@ -72,6 +77,13 @@ public class ServerScript : MonoBehaviour
 		Debug.Log("Server Initializied");
 	}
 	
+	void OnConnectedToServer()
+	{
+		Debug.Log("Server Joined");
+		_playerAccess.SpawnPlayer();
+		_destination.gameObject.SetActive (true);
+		this.gameObject.SetActive(false);
+	}
 	
 	void Update()
 	{
@@ -90,24 +102,24 @@ public class ServerScript : MonoBehaviour
 			MasterServer.RequestHostList(typeName);
 		}
 	}
-
+	
 	public void TypeGame(string gameMode)
 	{
 		gameType = gameMode;
 		Debug.Log(gameType);
 	}
-
+	
 	public void Difficulty(string chosenDifficulty)
 	{
 		difficulty = chosenDifficulty;
 	}
-
+	
 	public void SetName(string name)
 	{
 		gameName = name;
 		StartServer();
 	}
-
+	
 	private void JoinServer(HostData hostData)
 	{
 		Network.Connect(hostData);
