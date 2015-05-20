@@ -66,7 +66,7 @@ public class ServerScript : MonoBehaviour
 	
 	private void StartServer()
 	{
-		Network.InitializeServer (32, 6500, !Network.HavePublicAddress());
+		Network.InitializeServer (2, 6500, !Network.HavePublicAddress());
 		string name = gameName + " / " + gameType + " / " + difficulty;
 		MasterServer.RegisterHost (typeName, name);
 		_destination.gameObject.SetActive (true);
@@ -80,9 +80,7 @@ public class ServerScript : MonoBehaviour
 	void OnConnectedToServer()
 	{
 		Debug.Log("Server Joined");
-		_playerAccess.SpawnPlayer();
-		_destination.gameObject.SetActive (true);
-		this.gameObject.SetActive(false);
+
 	}
 	
 	void Update()
@@ -123,5 +121,9 @@ public class ServerScript : MonoBehaviour
 	private void JoinServer(HostData hostData)
 	{
 		Network.Connect(hostData);
+		_playerAccess.SpawnPlayer();
+		_destination.gameObject.SetActive (true);
+		this.gameObject.SetActive(false);
+		Debug.Log("ça passe ici aussi");
 	}
 }
