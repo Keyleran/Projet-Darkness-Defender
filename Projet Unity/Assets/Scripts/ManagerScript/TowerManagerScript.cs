@@ -10,6 +10,8 @@ using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
+
+
 // Define
 static class Constants
 {
@@ -29,22 +31,18 @@ static class Constants
 // --------------------------------------------------
 public class TowerManagerScript : MonoBehaviour
 {
-    private bool constructMode   = false;
-    private int  constructChoose = 0;
-    private int  buildingMoney   = 600;
-
-    private Dictionary<string, string> _grid;
-    private Dictionary<string, string> Grid
-    {
-        get { return _grid; }
-        set { _grid = value; }
-    }
+    private bool    constructMode   = false;
+    private int     constructChoose = 0;
+    private int     buildingMoney   = 600;
+    private Vector3 lastPosition    = new Vector3(0, 0, 0);
+    MuninAlgo Munin;
 
     public int BuildingMoney
     {
         get { return buildingMoney; }
         set { buildingMoney = value; }
     }
+
 
     [SerializeField]
     Text _buildingMoney;
@@ -57,6 +55,9 @@ public class TowerManagerScript : MonoBehaviour
 
     [SerializeField]
     Image[] _towers;
+
+    [SerializeField]
+    NavMeshAgent _gridMaker;
 
 
     #region [SerializeField] des differents poolScripts
@@ -106,10 +107,43 @@ public class TowerManagerScript : MonoBehaviour
 
     void Start()
     {
-        Grid = new Dictionary<string, string>();
         _ChoosenTowerFont.color = new Color(255, 255, 255, 0);
-    }
 
+
+        #region Initialisation Alogorithme de Munin
+        // X: -36 -> 40
+        // Z: -30 -> 30
+        int i = 0;
+        int j = 0;
+
+        Munin = new MuninAlgo();
+
+        for (int x = -50; x <= 50; x += 2)
+        {
+            for(int z = -40; z <= 40; z += 2)
+            {
+                NavMeshPath path = new NavMeshPath(); 
+                _gridMaker.CalculatePath(new Vector3(x, 0, z), path);
+                if (path.status == NavMeshPathStatus.PathComplete)
+                {
+                    Munin.GridMapping.Add(x.ToString() + ":" + z.ToString(), 'G');
+                    i++;
+                }
+                else
+                {
+                    Munin.GridMapping.Add(x.ToString() + ":" + z.ToString(), 'W');
+                    j++; 
+                }
+
+                Munin.GridState.Add(x.ToString() + ":" + z.ToString(), 0);
+            }
+        }
+        Debug.Log("Access: " + i + ", Denied: " + j);
+
+        Munin.InitiateGrid();
+        #endregion
+    }
+     
     void FixedUpdate()
     {
         if (constructMode)
@@ -118,9 +152,8 @@ public class TowerManagerScript : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit = new RaycastHit();
 
-            if (Physics.Raycast(ray, out hit))
+            if ((Physics.Raycast(ray, out hit)))
             {
-
                 float positionX = 0, positionY = 0, positionZ = 0;
 
                 _samplesPoolScript.ReturnSample();
@@ -136,6 +169,8 @@ public class TowerManagerScript : MonoBehaviour
 
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
                     sample.Transform.position = new Vector3(positionX, positionY, positionZ);
+
+                    Debug.Log(Munin.GridMapping[positionX.ToString() + ":" + positionZ.ToString()]);
                 }
                 else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
                 {
@@ -148,7 +183,7 @@ public class TowerManagerScript : MonoBehaviour
                 }
                 
                 // Si le joueur clique, acheter une tour
-                if(Input.GetMouseButtonDown(0))
+                if (Input.GetMouseButtonDown(0))
                 {
                     BuyTower(new Vector3(positionX, positionY, positionZ), hit, constructChoose);
                 }
@@ -285,7 +320,7 @@ public class TowerManagerScript : MonoBehaviour
 
     void BuyTower(Vector3 position, RaycastHit hit, int constructChoose)
     {
-        if ((hit.collider.tag == "Ground") && (constructChoose == 0))
+        if ((hit.collider.tag == "Ground") && (constructChoose == 0) && Munin.accessRequest(position.x, position.z))
         {
             BarricadeScript bar = _barricadePoolScript.GetBarricade(hit.collider.gameObject);
             if ((bar != null)&&(BuildingMoney - 50 >= 0))
@@ -293,6 +328,7 @@ public class TowerManagerScript : MonoBehaviour
                 bar.Transform.position = position;
                 BuildingMoney -= 50;
                 _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                Munin.BuildTower(position.x, position.z);
             }
             else
             {

@@ -15,7 +15,7 @@ public class LoadGame : MonoBehaviour {
 
 	void FixedUpdate()
 	{
-		Application.LoadLevel ("Gameplay");
+		Application.LoadLevel ("New_Map");
 		print(_character);
 	}
 

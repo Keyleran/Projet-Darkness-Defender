@@ -26,7 +26,10 @@ public class AmmoScript : MonoBehaviour
 
     [SerializeField]
     public int damage;
-    
+
+    [SerializeField]
+    AmmoPoolScript poolRappel;
+
     // Champs permettant de placer une barricade
     public Transform Transform
     {
@@ -51,5 +54,11 @@ public class AmmoScript : MonoBehaviour
         {
             _rigidbody = value;
         }
+    }
+
+    IEnumerator OnTriggerEnter(Collider _col)
+    {
+        yield return new WaitForFixedUpdate();
+        poolRappel.ReturnProjectile(this);
     }
 }

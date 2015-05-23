@@ -63,31 +63,30 @@ public class ShooterScript : MonoBehaviour
         while (true)
         {
             yield return new WaitForFixedUpdate();
-            AmmoScript ps = _ammoShooter.GetProjectile();
 
-            if (ps != null)
+            if (_enemiesTransform[0].position == new Vector3(0, -5, 0))
+                _enemiesTransform.Remove(_enemiesTransform[0]);
+
+            // TEMPORAIRE !!!
+            if (_enemiesTransform.Count == 0)
             {
-                ps.gameObject.SetActive(true);
+                StopCoroutine(ShootCoroutine);
+                ShootCoroutine = null;
+            }
+            else
+            {
+                AmmoScript ps = _ammoShooter.GetProjectile();
 
-                ps.Transform.position = _transform.position + new Vector3(0, 2, 0);
+                if (ps != null)
+                { 
+                    ps.gameObject.SetActive(true);
 
-                // TEMPORAIRE !!!
-                if (_enemiesTransform.Count == 0)
-                {
-                    StopCoroutine(ShootCoroutine);
-                    ShootCoroutine = null;
-                }
-                else if (_enemiesTransform[0].position == new Vector3(0, -5, 0))
-                    _enemiesTransform.Remove(_enemiesTransform[0]);
-                else
-                {
+                    ps.Transform.position = _transform.position + new Vector3(0, 2, 0);
                     ps.Rigidbody.velocity = (_enemiesTransform[0].position - ps.Transform.position).normalized * _projectileSpeed;
 
                     yield return new WaitForSeconds(_shootDelay);
+                    _ammoShooter.ReturnProjectile(ps);
                 }
-
-                //---------------
-
             }
         }
     }
