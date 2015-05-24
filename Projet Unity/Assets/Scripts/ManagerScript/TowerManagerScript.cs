@@ -169,8 +169,6 @@ public class TowerManagerScript : MonoBehaviour
 
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
                     sample.Transform.position = new Vector3(positionX, positionY, positionZ);
-
-                    Debug.Log(Munin.GridMapping[positionX.ToString() + ":" + positionZ.ToString()]);
                 }
                 else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
                 {

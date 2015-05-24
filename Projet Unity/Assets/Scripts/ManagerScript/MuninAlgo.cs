@@ -128,13 +128,13 @@ public class MuninAlgo
                     GridMapping[(x).ToString() + ":" + (z - 2).ToString()] = 'L';
 
                 UpdateGrid(x + 2, z + 2);
-                UpdateGrid(x + 2, z);
+                UpdateGrid(x + 2, z    );
                 UpdateGrid(x + 2, z - 2);
-                UpdateGrid(x, z - 2);
+                UpdateGrid(x    , z - 2);
                 UpdateGrid(x - 2, z - 2);
-                UpdateGrid(x - 2, z);
+                UpdateGrid(x - 2, z    );
                 UpdateGrid(x - 2, z + 2);
-                UpdateGrid(x, z + 2);
+                UpdateGrid(x    , z + 2);
             }
             else
             {
@@ -199,7 +199,6 @@ public class MuninAlgo
             if (state == 'A' || state == 'G' || state == 'L')
             {
                 accessR = true;
-                Debug.Log("trueR");
                 break;
             }
             i += 2;
@@ -212,7 +211,6 @@ public class MuninAlgo
             if (state == 'A' || state == 'G' || state == 'L')
             {
                 accessL = true;
-                Debug.Log("trueL");
                 break;
             }
             i += 2;
@@ -225,7 +223,6 @@ public class MuninAlgo
             if (state == 'A' || state == 'G' || state == 'L')
             {
                 accessU = true;
-                Debug.Log("trueU");
                 break;
             }
             i += 2;
@@ -238,7 +235,6 @@ public class MuninAlgo
             if (state == 'A' || state == 'G' || state == 'L')
             {
                 accessD = true;
-                Debug.Log("trueD");
                 break;
             }
             i += 2;
