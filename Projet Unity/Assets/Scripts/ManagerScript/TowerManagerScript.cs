@@ -34,7 +34,7 @@ public class TowerManagerScript : MonoBehaviour
     private bool    constructMode   = false;
     private int     constructChoose = 0;
     private int     buildingMoney   = 600;
-    private Vector3 lastPosition    = new Vector3(0, 0, 0);
+    //private Vector3 lastPosition    = new Vector3(0, 0, 0);
     MuninAlgo Munin;
 
     public int BuildingMoney
@@ -46,6 +46,7 @@ public class TowerManagerScript : MonoBehaviour
 
     [SerializeField]
     Text _buildingMoney;
+
 
     [SerializeField]
     Text _ChoosenTower;
@@ -59,6 +60,8 @@ public class TowerManagerScript : MonoBehaviour
     [SerializeField]
     NavMeshAgent _gridMaker;
 
+    [SerializeField]
+    Material _sampleMat;
 
     #region [SerializeField] des differents poolScripts
     [SerializeField]
@@ -167,11 +170,17 @@ public class TowerManagerScript : MonoBehaviour
                     positionY = roundNumber(hit.point.y);
                     positionZ = roundNumber(hit.point.z);
 
+                    if (Munin.accessRequest(positionX, positionZ))
+                        _sampleMat.color = new Color(0, 150, 0);
+                    else
+                        _sampleMat.color = new Color(150, 0, 0);
+
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
                     sample.Transform.position = new Vector3(positionX, positionY, positionZ);
                 }
                 else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
                 {
+                    _sampleMat.color = new Color(0, 255, 0);
                     positionX = hit.transform.position.x;
                     positionY = hit.transform.position.y + 0.5f;
                     positionZ = hit.transform.position.z;

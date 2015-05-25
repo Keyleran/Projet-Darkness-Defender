@@ -16,8 +16,13 @@ using System.Collections.Generic;
 // --------------------------------------------------
 public class NetworkScript : MonoBehaviour
 {
-    private const string typeName = "UniqueGameName";
+    private const string typeName = "DarknessDefender";
     private const string gameName = "Darkness Defender";
+    private HostData[] hostList;
+    private bool isRefreshingHostList = false;
+
+    public GameObject playerPrefab;
+    private Data_keeper _data;
 
     [SerializeField]
     private PlayerManagerScript _playerAccess;
@@ -39,36 +44,61 @@ public class NetworkScript : MonoBehaviour
         set { _nbPlayer = value; }
     }
 
-    // Use this for initialization
+
     void Start()
+    {
+        GameObject Network_Data = GameObject.Find("Network_Data");
+        _data = (Data_keeper) Network_Data.GetComponent("Data_keeper");
+
+        if (_data.gameMode == "Multi")
+            StartServer();
+        else
+            Instantiate(playerPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity);
+    }
+
+    void Update()
+    {
+        if (isRefreshingHostList && MasterServer.PollHostList().Length > 0)
+        {
+            isRefreshingHostList = false;
+            hostList = MasterServer.PollHostList();
+        }
+    }
+
+    void StartServer()
     {
         Application.runInBackground = true;
 
-        if (IsServer)
+        if (_data.isServer)
         {
-            Network.InitializeSecurity();
-            Network.InitializeServer(2, 6600, true);
+            Network.InitializeServer(2, 25000, true);
             MasterServer.RegisterHost(typeName, gameName);
         }
         else
         {
-            Network.Connect("127.0.0.1", 6600);
+            Network.Connect(_data.hostData);
         }
     }
 
     void OnServerInitialized()
     {
-        _playerAccess.SpawnPlayer();
+        SpawnPlayer();
     }
 
     void OnConnectedToServer()
     {
-        _playerAccess.SpawnPlayer();
+        SpawnPlayer();
+        Debug.Log("Server Joined");
     }
 
-    void OnPlayerConnected(NetworkPlayer player)
+    private void SpawnPlayer()
     {
-        print("Player Connected");
+        Network.Instantiate(playerPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
     }
 
+    void OnMasterServerEvent(MasterServerEvent msEvent)
+    {
+        if (msEvent == MasterServerEvent.HostListReceived)
+            hostList = MasterServer.PollHostList();
+    }
 }

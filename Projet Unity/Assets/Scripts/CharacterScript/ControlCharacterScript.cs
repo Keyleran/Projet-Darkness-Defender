@@ -28,18 +28,27 @@ public class ControlCharacterScript : MonoBehaviour
     Rigidbody _rigibodyPlayer = new Rigidbody();
 
     [SerializeField]
+    NetworkView _network;
+
+    [SerializeField]
     Animator _walk;
 
     // Parametres personnages
     private float speed      = 10.0f; // Vitesse de deplacement
     private float gravity    = -9.81f; // Gravité terrestre 9.81 m/s²
     private float heightJump = 1.0f; // Hauteur des sauts
-    private bool  isJumping  = false; // Ce booleen bloque certaines fonctionnalites pendant le saut du personnage, par exemple le deplacement
+    private bool isJumping = false; // Ce booleen bloque certaines fonctionnalites pendant le saut du personnage, par exemple le deplacement
+    private Data_keeper _data;
 
-     
+    void Start()
+    {
+        GameObject Network_Data = GameObject.Find("Network_Data");
+        _data = (Data_keeper)Network_Data.GetComponent("Data_keeper");
+    }
+
     void FixedUpdate()
     {
-        if (isJumping == false) // Bloque le controle du personnage pendant le saut
+        if ((isJumping == false) && ((_network.isMine) || (_data.gameMode == "Solo")))// Bloque le controle du personnage pendant le saut
         {
             Vector3 direction = new Vector3(0, 0, 0);
 

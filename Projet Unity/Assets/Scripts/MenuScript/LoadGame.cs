@@ -10,8 +10,9 @@ using System.Collections;
 
 public class LoadGame : MonoBehaviour {
 
-	[SerializeField]
-	string _character;
+    [SerializeField]
+    string _character;
+
 
 	void FixedUpdate()
 	{
