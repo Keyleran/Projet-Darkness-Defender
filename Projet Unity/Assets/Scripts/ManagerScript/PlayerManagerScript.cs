@@ -13,7 +13,7 @@ using System.Collections;
 // Script: Player Manager
 // 
 // --------------------------------------------------
-public class PlayerManagerScript : MonoBehaviour 
+public class PlayerManagerScript : MonoBehaviour
 {
     [SerializeField]
     PlayerScript[] _players;
@@ -26,6 +26,7 @@ public class PlayerManagerScript : MonoBehaviour
     // Renvoi une tour à chaque appel
     public PlayerScript SpawnPlayer()
     {
+
         _players[index].transform.position = _spawnPlayer.position;
         _players[index].playerId = index;
         index++;

@@ -30,19 +30,28 @@ public class PlayerScript : MonoBehaviour
     private float AncientHealth;
 
     [SerializeField]
-    Slider _healthBar;
+    private Slider _healthBar;
 
     [SerializeField]
-    Text _health;
+    private Text _health;
 
     [SerializeField]
-    Text _message;
+    private Text _message;
 
 
     void Start()
     {
         health = InitialHealth;
         AncientHealth = InitialHealth;
+
+        GameObject Interface = GameObject.Find("Mask_health");
+        _healthBar = (Slider)Interface.GetComponent("Slider");
+
+        Interface = GameObject.Find("Health");
+        _health = (Text)Interface.GetComponent("Text");
+
+        Interface = GameObject.Find("Message");
+        _message = (Text)Interface.GetComponent("Text");
     } 
     void FixedUpdate()
     {

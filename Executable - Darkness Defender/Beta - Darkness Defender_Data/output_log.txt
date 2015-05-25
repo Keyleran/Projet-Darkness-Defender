@@ -1,0 +1,100 @@
+Initialize engine version: 5.0.0p3 (8c9c1a5d2db2)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: Intel(R) HD Graphics 4600 (ID=0x416)
+    Vendor:   Intel
+    VRAM:     128 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+- Completed reload, in  0.105 seconds
+Initialize engine version: 5.0.0p3 (8c9c1a5d2db2)
+GfxDevice: creating device client; threaded=1
+Direct3D:
+    Version:  Direct3D 11.0 [level 11.0]
+    Renderer: Intel(R) HD Graphics 4600 (ID=0x416)
+    Vendor:   Intel
+    VRAM:     128 MB
+Begin MonoManager ReloadAssembly
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\UnityEngine.dll (this message is harmless)
+Loading E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\UnityEngine.dll into Unity Child Domain
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\Assembly-CSharp.dll (this message is harmless)
+Loading E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\UnityEngine.UI.dll (this message is harmless)
+Loading E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
+- Completed reload, in  0.039 seconds
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
+<RI> Initializing input.
+<RI> Input initialized.
+<RI> Initialized touch support.
+<RI> Initialized touch support.
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\System.dll (this message is harmless)
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Beta - Darkness Defender_Data\Managed\System.dll (this message is harmless)
+Archer
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.877019 ms
+
+Unloading 2 unused Assets to reduce memory usage. Loaded Objects now: 6828.
+Total: 1.083022 ms (FindLiveObjects: 0.247559 ms CreateObjectMapping: 0.103868 ms MarkObjects: 0.720509 ms  DeleteObjects: 0.010263 ms)
+
+Access: 693, Denied: 1398
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+choice
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Archer
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Unloading 3 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 3.226897 ms
+
+Unloading 2 unused Assets to reduce memory usage. Loaded Objects now: 6828.
+Total: 2.669785 ms (FindLiveObjects: 0.652769 ms CreateObjectMapping: 0.344859 ms MarkObjects: 1.608932 ms  DeleteObjects: 0.061582 ms)
+
+Access: 693, Denied: 1398
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Server Joined
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+choice
+ 
+(Filename: C:/buildslave/unity/build/artifacts/generated/common/runtime/UnityEngineDebug.gen.cpp Line: 56)
+
+Unloading 1 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 41.518185 ms
+
+Unloading 147 unused Assets to reduce memory usage. Loaded Objects now: 508.
+Total: 0.777986 ms (FindLiveObjects: 0.032843 ms CreateObjectMapping: 0.020116 ms MarkObjects: 0.286151 ms  DeleteObjects: 0.427789 ms)
+
+Unloading 1 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 1.676262 ms
+
+Unloading 1 unused Assets to reduce memory usage. Loaded Objects now: 508.
+Total: 0.386735 ms (FindLiveObjects: 0.037359 ms CreateObjectMapping: 0.011084 ms MarkObjects: 0.333363 ms  DeleteObjects: 0.004105 ms)
+
+Unloading 1 Unused Serialized files (Serialized files now loaded: 0)
+UnloadTime: 2.446037 ms
+
+Unloading 147 unused Assets to reduce memory usage. Loaded Objects now: 508.
+Total: 1.874967 ms (FindLiveObjects: 0.049265 ms CreateObjectMapping: 0.039823 ms MarkObjects: 0.745552 ms  DeleteObjects: 1.038683 ms)
+
