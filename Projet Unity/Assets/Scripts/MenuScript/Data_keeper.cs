@@ -14,7 +14,8 @@ public class Data_keeper : MonoBehaviour
     public string gameName = "";
     public string gameMode = "Solo";
     public string difficulty = "";
-    public bool   isServer   = false;
+    public bool isServer     = false;
+    public int Nb_Player     = 0;
 
     public HostData hostData;
 

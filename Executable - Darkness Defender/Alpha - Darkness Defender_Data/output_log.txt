@@ -12,51 +12,33 @@ Platform assembly: E:\ESGI\Projet Annuel\Projet-Darkness-Defender\Executable - D
 Loading E:\ESGI\Projet Annuel\Projet-Darkness-Defender\Executable - Darkness Defender\Alpha - Darkness Defender_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
 Platform assembly: E:\ESGI\Projet Annuel\Projet-Darkness-Defender\Executable - Darkness Defender\Alpha - Darkness Defender_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading E:\ESGI\Projet Annuel\Projet-Darkness-Defender\Executable - Darkness Defender\Alpha - Darkness Defender_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.122 seconds
+- Completed reload, in  0.039 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
 Platform assembly: E:\ESGI\Projet Annuel\Projet-Darkness-Defender\Executable - Darkness Defender\Alpha - Darkness Defender_Data\Managed\System.Core.dll (this message is harmless)
 Platform assembly: E:\ESGI\Projet Annuel\Projet-Darkness-Defender\Executable - Darkness Defender\Alpha - Darkness Defender_Data\Managed\System.dll (this message is harmless)
-Infinie
- 
-(Filename: C:/buildslave/unity/build/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 56)
-
-Server Initializied
- 
-(Filename: C:/buildslave/unity/build/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 56)
-
-test / Infinie / 
- 
-(Filename: C:/buildslave/unity/build/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 56)
-
 Archer
  
 (Filename: C:/buildslave/unity/build/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 56)
 
-UnloadTime: 1.753034 ms
+UnloadTime: 1.933264 ms
 Unloading 4 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
-Unloading 2 unused Assets to reduce memory usage. Loaded Objects now: 11689.
-Total: 1.601542 ms (FindLiveObjects: 0.334185 ms CreateObjectMapping: 0.084572 ms MarkObjects: 0.628136 ms  DeleteObjects: 0.025453 ms)
+Unloading 2 unused Assets to reduce memory usage. Loaded Objects now: 11657.
+Total: 1.454977 ms (FindLiveObjects: 0.316121 ms CreateObjectMapping: 0.055013 ms MarkObjects: 0.557522 ms  DeleteObjects: 0.017242 ms)
 
 choice
  
 (Filename: C:/buildslave/unity/build/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 56)
 
-Receiving NAT punchthrough attempt from target 954763141967365432 failed
-
+Launch
  
-(Filename:  Line: 828)
+(Filename: C:/buildslave/unity/build/artifacts/StandalonePlayerGenerated/UnityEngineDebug.cpp Line: 56)
 
-Receiving NAT punchthrough attempt from target 954763141967365432 failed
-
- 
-(Filename:  Line: 828)
-
-UnloadTime: 12.122624 ms
+UnloadTime: 12.441620 ms
 Unloading 2 Unused Serialized files (Serialized files now loaded: 0 / Dirty serialized files: 0)
 
-Unloading 133 unused Assets to reduce memory usage. Loaded Objects now: 492.
-Total: 1.548582 ms (FindLiveObjects: 0.018064 ms CreateObjectMapping: 0.018474 ms MarkObjects: 0.348554 ms  DeleteObjects: 0.704498 ms)
+Unloading 133 unused Assets to reduce memory usage. Loaded Objects now: 460.
+Total: 1.453746 ms (FindLiveObjects: 0.016421 ms CreateObjectMapping: 0.020116 ms MarkObjects: 0.281224 ms  DeleteObjects: 0.637579 ms)
 

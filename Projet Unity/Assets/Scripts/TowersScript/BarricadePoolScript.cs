@@ -18,30 +18,33 @@ using System.Collections.Generic;
 public class BarricadePoolScript : MonoBehaviour
 {
     private List<int> idBarUnset = new List<int>(); 
-    private int index = 0;
 
     [SerializeField]
-    BarricadeScript[] _barricade;
+    public BarricadeScript[] _barricade;
+
+    void Start()
+    {
+        int index = 0;
+        foreach (BarricadeScript barricade in _barricade)
+        {
+            barricade.id = index;
+            idBarUnset.Add(barricade.id);
+            index++;
+        }
+    }
+
 
     // Renvoi une barricade à chaque appel
-    public BarricadeScript GetBarricade(GameObject ground)
+    public BarricadeScript GetBarricade()
     {
-        if((idBarUnset.Count != 0)||(index < _barricade.Length))
+        if(idBarUnset.Count != 0)
         {
             BarricadeScript barricade = null;
-            if(idBarUnset.Count != 0)
-            {
-                int id = idBarUnset[0];
-                idBarUnset.Remove(id);
-                barricade = _barricade[id];
-            }
-            else if (index < _barricade.Length)
-            {
-                barricade = _barricade[index];
-                barricade.id = index;
-                index++;
-            }
-            barricade.ground = ground;
+
+            int id = idBarUnset[0];
+            idBarUnset.Remove(id);
+            barricade = _barricade[id];
+
             barricade.gameObject.SetActive(true);
             return barricade;
         }
@@ -50,12 +53,20 @@ public class BarricadePoolScript : MonoBehaviour
         return null;
     }
 
-    public void ReturnBarricade(BarricadeScript barricade)
+    public void ReturnBarricade(int id)
     {
-        barricade.Transform.position = this.transform.position;
-        idBarUnset.Add(barricade.id);
-        barricade.gameObject.SetActive(false);
-        barricade.ground.tag = "Ground";
-        barricade.ground = null;
+        _barricade[id].Transform.position = this.transform.position;
+        idBarUnset.Add(id);
+        _barricade[id].gameObject.SetActive(false);
+    }
+
+    public void Active(int id)
+    {
+        _barricade[id].gameObject.SetActive(true);
+    }
+
+    public void Desactive(int id)
+    {
+        _barricade[id].gameObject.SetActive(false);
     }
 }

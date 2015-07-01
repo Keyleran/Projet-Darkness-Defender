@@ -17,7 +17,6 @@ using System.Collections;
 public class BarricadeScript : MonoBehaviour 
 {
     public int id = 0;
-    public GameObject ground = null;
      
     [SerializeField]
     Transform _transform;
@@ -51,21 +50,4 @@ public class BarricadeScript : MonoBehaviour
         }
     }
 
-
-
-
-    /*
-    public void UpdateNeighbor()
-    {
-        if(ground != null)
-        {
-            SphereCollider Detect = (SphereCollider) ground.GetComponent("SphereCollider");
-            Detect.
-            foreach(Detect.rigidbody.)
-            {
-
-            }
-        }
-    }
-     */
 }

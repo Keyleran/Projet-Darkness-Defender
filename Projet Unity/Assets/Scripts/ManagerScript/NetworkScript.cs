@@ -21,11 +21,9 @@ public class NetworkScript : MonoBehaviour
     private HostData[] hostList;
     private bool isRefreshingHostList = false;
 
+
     public GameObject playerPrefab;
     private Data_keeper _data;
-
-    [SerializeField]
-    private PlayerManagerScript _playerAccess;
 
     [SerializeField]
     private bool _isServer = true;
@@ -44,6 +42,8 @@ public class NetworkScript : MonoBehaviour
         set { _nbPlayer = value; }
     }
 
+    [SerializeField]
+    TowerManagerScript towerScript;
 
     void Start()
     {
@@ -54,7 +54,10 @@ public class NetworkScript : MonoBehaviour
             StartServer();
         else
             Instantiate(playerPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity);
+
+
     }
+
 
     void Update()
     {
@@ -64,6 +67,7 @@ public class NetworkScript : MonoBehaviour
             hostList = MasterServer.PollHostList();
         }
     }
+
 
     void StartServer()
     {

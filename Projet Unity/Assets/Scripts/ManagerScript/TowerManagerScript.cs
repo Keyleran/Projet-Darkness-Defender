@@ -31,22 +31,15 @@ static class Constants
 // --------------------------------------------------
 public class TowerManagerScript : MonoBehaviour
 {
-    private bool    constructMode   = false;
-    private int     constructChoose = 0;
-    private int     buildingMoney   = 600;
-    //private Vector3 lastPosition    = new Vector3(0, 0, 0);
+    private bool constructMode  = false;
+    private int constructChoose = 0;
+    private int buildingMoney   = 600;
+    private Vector3 lastCursor  = new Vector3(0, 0, 0);
+    private int _player;
     MuninAlgo Munin;
-
-    public int BuildingMoney
-    {
-        get { return buildingMoney; }
-        set { buildingMoney = value; }
-    }
-
 
     [SerializeField]
     Text _buildingMoney;
-
 
     [SerializeField]
     Text _ChoosenTower;
@@ -62,6 +55,9 @@ public class TowerManagerScript : MonoBehaviour
 
     [SerializeField]
     Material _sampleMat;
+
+    [SerializeField]
+    Material[] _sampleMatChange;
 
     #region [SerializeField] des differents poolScripts
     [SerializeField]
@@ -108,6 +104,9 @@ public class TowerManagerScript : MonoBehaviour
     #endregion
     */
 
+    [SerializeField]
+    NetworkView network;
+
     void Start()
     {
         _ChoosenTowerFont.color = new Color(255, 255, 255, 0);
@@ -149,6 +148,11 @@ public class TowerManagerScript : MonoBehaviour
      
     void FixedUpdate()
     {
+        if (Network.isClient)
+            _player = 1;
+        else
+            _player = 0;
+
         if (constructMode)
         {
             // Pointeur - Permet de positioner un sample ou une tour à l'endroit où le curseur pointe
@@ -159,6 +163,11 @@ public class TowerManagerScript : MonoBehaviour
             {
                 float positionX = 0, positionY = 0, positionZ = 0;
 
+                positionX = roundNumber(hit.point.x);
+                positionY = roundNumber(hit.point.y);
+                positionZ = roundNumber(hit.point.z);
+
+                #region SAMPLES
                 _samplesPoolScript.ReturnSample();
 
                 // Sample = Aperçu, permet de voir où seront placés les élèments
@@ -166,21 +175,25 @@ public class TowerManagerScript : MonoBehaviour
                 if ((hit.collider.tag == "Ground") && (constructChoose == 0))
                 {
                     // Récupère les coordonnées de l'objet visé
-                    positionX = roundNumber(hit.point.x);
-                    positionY = roundNumber(hit.point.y);
-                    positionZ = roundNumber(hit.point.z);
 
                     if (Munin.accessRequest(positionX, positionZ))
-                        _sampleMat.color = new Color(0, 150, 0);
+                    {
+                        Color new_color = _sampleMatChange[0].color;
+                        _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
+                    }
                     else
-                        _sampleMat.color = new Color(150, 0, 0);
+                    {
+                        Color new_color = _sampleMatChange[1].color;
+                        _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
+                    }
 
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
                     sample.Transform.position = new Vector3(positionX, positionY, positionZ);
                 }
                 else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
                 {
-                    _sampleMat.color = new Color(0, 255, 0);
+                    Color new_color = _sampleMatChange[0].color;
+                    _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
                     positionX = hit.transform.position.x;
                     positionY = hit.transform.position.y + 0.5f;
                     positionZ = hit.transform.position.z;
@@ -188,11 +201,40 @@ public class TowerManagerScript : MonoBehaviour
                     SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
                     sample.Transform.position = new Vector3(positionX, positionY, positionZ);
                 }
-                
+                #endregion
+
                 // Si le joueur clique, acheter une tour
                 if (Input.GetMouseButtonDown(0))
                 {
-                    BuyTower(new Vector3(positionX, positionY, positionZ), hit, constructChoose);
+                    if (hit.collider.tag == "Ground")
+                    {
+                        if (Network.isServer)
+                            BuyBar(new Vector3(positionX, positionY, positionZ), buildingMoney, 0);
+                        else
+                            network.RPC("BuyBar", RPCMode.Server, new Vector3(positionX, positionY, positionZ), buildingMoney, _player);
+                    }
+                    else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
+                    {
+                        int id_bar = ((BarricadeScript)hit.collider.gameObject.GetComponent("BarricadeScript")).id;
+                        if (Network.isServer)
+                            BuyTower(new Vector3(positionX, positionY, positionZ), id_bar, constructChoose, buildingMoney, 0);
+                        else
+                            network.RPC("BuyTower", RPCMode.Server, new Vector3(positionX, positionY, positionZ), id_bar, constructChoose, buildingMoney, _player);
+                    }
+                }
+
+                // Si le joueur appui sur U, améliorer une tour
+                if((hit.collider.tag == "Shooter") && (constructChoose > 0))
+                {
+                    if(Input.GetButtonDown("UpgradeMode"))
+                    {
+                        ShooterScript shooter = (ShooterScript)hit.collider.gameObject.GetComponent("ShooterScript");
+                        if (buildingMoney >= 100 && shooter.UpgradeTower())
+                        {
+                            buildingMoney -= 100;
+                            _buildingMoney.text = "Matériaux: " + buildingMoney;
+                        }
+                    }
                 }
             }
         }
@@ -325,151 +367,152 @@ public class TowerManagerScript : MonoBehaviour
         return new_value;
     }
 
-    void BuyTower(Vector3 position, RaycastHit hit, int constructChoose)
+    [RPC]
+    void BuyBar(Vector3 position, int BuildingMon, int id_player)
     {
-        if ((hit.collider.tag == "Ground") && (constructChoose == 0) && Munin.accessRequest(position.x, position.z))
+        BarricadeScript bar = _barricadePoolScript.GetBarricade();
+        if ((bar != null) && (BuildingMon - 50 >= 0))
         {
-            BarricadeScript bar = _barricadePoolScript.GetBarricade(hit.collider.gameObject);
-            if ((bar != null)&&(BuildingMoney - 50 >= 0))
-            {
-                bar.Transform.position = position;
-                BuildingMoney -= 50;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
-                Munin.BuildTower(position.x, position.z);
-            }
-            else
-            {
-                print("Barricade Limit Reach");
-            }
+            bar.Transform.position = position;
+            network.RPC("ActiveBar", RPCMode.All, bar.id);
+            network.RPC("ModifMoney", RPCMode.All, id_player, -50);
         }
-        else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
+        else
         {
-            TowersScript tower = null;
-            switch(constructChoose)
-            {
-                case Constants.Shooter:
-                    if (BuildingMoney - 100 >= 0)
-                    {
-                        tower = _shooterPoolScript.GetTower(hit.collider.gameObject);
-                        BuildingMoney -= 100;
-                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
-                    }
-                    break;
-                case Constants.Canon:
-                    if (BuildingMoney - 150 >= 0)
-                    {
-                        tower = _canonPoolScript.GetTower(hit.collider.gameObject);
-                        BuildingMoney -= 150;
-                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
-                    }
-                    break;
-                case Constants.Fire:
-                    if (BuildingMoney - 200 >= 0)
-                    {
-                        tower = _firePoolScript.GetTower(hit.collider.gameObject);
-                        BuildingMoney -= 200;
-                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
-                    }
-                    break;
-                case Constants.Ice:
-                    if (BuildingMoney - 100 >= 0)
-                    {
-                        tower = _icePoolScript.GetTower(hit.collider.gameObject);
-                        BuildingMoney -= 100;
-                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
-                    }
-                    break;
-                case Constants.Poison:
-                    if (BuildingMoney - 100 >= 0)
-                    {
-                        tower = _poisonPoolScript.GetTower(hit.collider.gameObject);
-                        BuildingMoney -= 100;
-                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
-                    }
-                    break;
-                case Constants.Magic:
-                    if (BuildingMoney - 200 >= 0)
-                    {
-                        tower = _magicPoolScript.GetTower(hit.collider.gameObject);
-                        BuildingMoney -= 200;
-                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
-                    }
-                    break;
-                case Constants.Detector:
-                    if (BuildingMoney - 150 >= 0)
-                    {
-                        tower = _detectorPoolScript.GetTower(hit.collider.gameObject);
-                        BuildingMoney -= 150;
-                        _buildingMoney.text = "Matériaux: " + BuildingMoney;
-                    }
-                    break;
-            }
-
-            if (tower != null)
-            {
-                tower.Transform.position = position;
-                hit.collider.tag = "BarricadeUse";
-            }
-            else
-            {
-                print("Tower Limit Reach or not enough money");
-            }
+            print("Barricade Limit Reach");
         }
     }
 
+    [RPC]
+    void BuyTower(Vector3 position, int id_bar, int constructChoose, int BuildingMon, int id_player)
+    {
+        int money = 0;
+        TowersScript tower = null;
+        switch(constructChoose)
+        {
+            case Constants.Shooter:
+                if (BuildingMon - 100 >= 0)
+                {
+                    tower = _shooterPoolScript.GetTower();
+                    money = -100;
+                }
+                break;
+            case Constants.Canon:
+                if (BuildingMon - 150 >= 0)
+                {
+                    tower = _canonPoolScript.GetTower();
+                    money = -150;
+                }
+                break;
+            case Constants.Fire:
+                if (BuildingMon - 200 >= 0)
+                {
+                    tower = _firePoolScript.GetTower();
+                    money = -200;
+                }
+                break;
+            case Constants.Ice:
+                if (BuildingMon - 100 >= 0)
+                {
+                    tower = _icePoolScript.GetTower();
+                    money = -100;
+                }
+                break;
+            case Constants.Poison:
+                if (BuildingMon - 100 >= 0)
+                {
+                    tower = _poisonPoolScript.GetTower();
+                    money = -100;
+                }
+                break;
+            case Constants.Magic:
+                if (BuildingMon - 200 >= 0)
+                {
+                    tower = _magicPoolScript.GetTower();
+                    money = -200;
+                }
+                break;
+            case Constants.Detector:
+                if (BuildingMon - 150 >= 0)
+                {
+                    tower = _detectorPoolScript.GetTower();
+                    money = -150;
+                }
+                break;
+        }
+
+        if (tower != null)
+        {
+            tower.Transform.position = position;
+            network.RPC("ActiveTower", RPCMode.All, tower.id, id_bar, constructChoose);
+            network.RPC("ModifMoney", RPCMode.All, id_player, money);
+            network.RPC("UpdateBar", RPCMode.All, id_bar);
+        }
+        else
+        {
+            print("Tower Limit Reach or not enough money");
+        }
+    }
+
+    [RPC]
+    void UpdateBar(int id_bar)
+    {
+        string tag = _barricadePoolScript._barricade[id_bar].tag;
+        if (tag == "BarricadeUse")
+            _barricadePoolScript._barricade[id_bar].tag = "Barricade";
+        else if (tag == "Barricade")
+            _barricadePoolScript._barricade[id_bar].tag = "BarricadeUse";
+    }
 
     // Fonction permettant de vendre les tours/barrcades
     void SellTower(RaycastHit hit)
     {
+        int id;
         switch(hit.collider.tag)
         {
             case "Barricade":
-                _barricadePoolScript.ReturnBarricade((BarricadeScript) hit.collider.gameObject.GetComponent("BarricadeScript"));
-                BuildingMoney += 50;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                id = ((BarricadeScript) hit.collider.gameObject.GetComponent("BarricadeScript")).id;
+                network.RPC("SellTowerNetwork", RPCMode.All, "Barricade", id);
+                ModifMoney(_player, 50);
                 break;
             case "Shooter":
-                _shooterPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
-                BuildingMoney += 100;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                TowersScript tower = ((TowersScript)hit.collider.gameObject.GetComponent("TowersScript"));
+                network.RPC("SellTowerNetwork", RPCMode.All, "Shooter", tower.id);
+                network.RPC("UpdateBar", RPCMode.All, tower.id_barricade);
+                ModifMoney(_player, 100 * (((ShooterScript) hit.collider.gameObject.GetComponent("ShooterScript")).levelTower));
                 break;
             case "Canon":
-                _canonPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
-                BuildingMoney += 150;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                buildingMoney += 150;
+                _buildingMoney.text = "Matériaux: " + buildingMoney;
                 break;
             case "Fire":
-                _firePoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
-                BuildingMoney += 200;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                buildingMoney += 200;
+                _buildingMoney.text = "Matériaux: " + buildingMoney;
                 break;
             case "Ice":
-                _icePoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
-                BuildingMoney += 100;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                buildingMoney += 100;
+                _buildingMoney.text = "Matériaux: " + buildingMoney;
                 break;
             case "Poison":
-                _poisonPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
-                BuildingMoney += 100;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                buildingMoney += 100;
+                _buildingMoney.text = "Matériaux: " + buildingMoney;
                 break;
             case "Magic":
-                _magicPoolScript.ReturnTower((TowersScript) hit.collider.gameObject.GetComponent("TowersScript"));
-                BuildingMoney += 200;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                buildingMoney += 200;
+                _buildingMoney.text = "Matériaux: " + buildingMoney;
                 break;
             case "Detector":
-                _detectorPoolScript.ReturnTower((TowersScript)hit.collider.gameObject.GetComponent("TowersScript"));
-                BuildingMoney += 150;
-                _buildingMoney.text = "Matériaux: " + BuildingMoney;
+                buildingMoney += 150;
+                _buildingMoney.text = "Matériaux: " + buildingMoney;
                 break;
         }
     }
 
+    [RPC]
     public void AddBuildingMoney(int add)
     {
-        BuildingMoney += add;
-        _buildingMoney.text = "Matériaux: " + BuildingMoney;
+        buildingMoney += add;
+        _buildingMoney.text = "Matériaux: " + buildingMoney;
     }
 
     void RazUITowers()
@@ -487,5 +530,115 @@ public class TowerManagerScript : MonoBehaviour
         _towers[5].color = new Color(180, 0, 0);
         _towers[6].color = new Color(180, 0, 0);
         _towers[7].color = new Color(180, 0, 0);
+    }
+
+    [RPC]
+    void ActiveBar(int id)
+    {
+       _barricadePoolScript.Active(id);
+    }
+
+    [RPC]
+    void DesactiveBar(int id)
+    {
+        _barricadePoolScript.Desactive(id);
+    }
+
+    [RPC]
+    void ActiveTower(int id, int id_bar, int type)
+    {
+        switch(type)
+        {
+            case Constants.Shooter:
+                _shooterPoolScript.Active(id);
+                _shooterPoolScript._towers[id].id_barricade = id_bar;
+                break;
+            case Constants.Canon:
+                _canonPoolScript.Active(id);
+                break;
+            case Constants.Fire:
+                _firePoolScript.Active(id);
+                break;
+            case Constants.Ice:
+                _icePoolScript.Active(id);
+                break;
+            case Constants.Poison:
+                _magicPoolScript.Active(id);
+                break;
+            case Constants.Magic:
+                _magicPoolScript.Active(id);
+                break;
+            case Constants.Detector:
+                _detectorPoolScript.Active(id);
+                break;
+        }
+    }
+
+    [RPC]
+    void DesactiveTower(int id, int type)
+    {
+        switch (type)
+        {
+            case Constants.Shooter:
+                _shooterPoolScript.Desactive(id);
+                _shooterPoolScript._towers[id].id_barricade = 0;
+                break;
+            case Constants.Canon:
+                _canonPoolScript.Desactive(id);
+                break;
+            case Constants.Fire:
+                _firePoolScript.Desactive(id);
+                break;
+            case Constants.Ice:
+                _icePoolScript.Desactive(id);
+                break;
+            case Constants.Poison:
+                _magicPoolScript.Desactive(id);
+                break;
+            case Constants.Magic:
+                _magicPoolScript.Desactive(id);
+                break;
+            case Constants.Detector:
+                _detectorPoolScript.Desactive(id);
+                break;
+        }
+    }
+
+    [RPC]
+    void ModifMoney(int idPlayer, int money)
+    {
+        if (idPlayer == _player)
+        {
+            buildingMoney += money;
+            _buildingMoney.text = "Matériaux: " + buildingMoney;
+        }
+    }
+
+    [RPC]
+    void SellTowerNetwork(string Type, int id)
+    {
+        switch (Type)
+        {
+            case "Barricade":
+                _barricadePoolScript.ReturnBarricade(id);
+                break;
+            case "Shooter":
+                _shooterPoolScript.ReturnTower(id);
+                ShooterScript shooter = (ShooterScript)_shooterPoolScript._towers[id].gameObject.GetComponent("ShooterScript");
+                shooter.RazLevel();
+                break;
+            case "Canon":
+                break;
+            case "Fire":
+                break;
+            case "Ice":
+                break;
+            case "Poison":
+                break;
+            case "Magic":
+                break;
+            case "Detector":
+                break;
+        }
     }
 }

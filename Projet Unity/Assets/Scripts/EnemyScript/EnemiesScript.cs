@@ -10,7 +10,7 @@ using System.Collections;
 
 // --------------------------------------------------
 // 
-// Script Coordonées unités
+// Script unités
 // 
 // --------------------------------------------------
 public class EnemiesScript : MonoBehaviour 
@@ -18,12 +18,20 @@ public class EnemiesScript : MonoBehaviour
     public int id = 0;
 
     [SerializeField]
+    public int health;
+
+    [SerializeField]
+    EnemyPoolScript poolRappel;
+
+    [SerializeField]
+    private int actualHealth;
+
+    [SerializeField]
     Transform _transform;
 
     [SerializeField]
     Rigidbody _rigidbody;
 
-    // Champs permettant de placer une barricade
     public Transform Transform
     {
         get
@@ -36,7 +44,6 @@ public class EnemiesScript : MonoBehaviour
         }
     }
 
-    // Champs permettant d'appliquer de la physique
     public Rigidbody Rigidbody
     {
         get
@@ -55,9 +62,11 @@ public class EnemiesScript : MonoBehaviour
     [SerializeField]
     Animator _Move;
 
+    [SerializeField]
+    NetworkView _network;
+
     private GameObject player;
     private PlayerScript playerScript;
-    private Transform lastPosition;
 
     void Start()
     {
@@ -66,9 +75,10 @@ public class EnemiesScript : MonoBehaviour
         _Move.SetBool("Walk", true); 
     }
 
-    void Update()
+    void FixedUpdate()
     {
-        _agent.SetDestination(player.transform.position);
+        if(Network.isServer)
+            _agent.SetDestination(player.transform.position);
     }
 
     void OnTriggerEnter(Collider col)
@@ -94,5 +104,26 @@ public class EnemiesScript : MonoBehaviour
             yield return new WaitForSeconds(1);
             playerScript.Health -= 2;
         }
+    }
+
+    public void impactTower(int damage)
+    {
+        new WaitForSeconds(0.5f);
+        actualHealth -= damage;
+
+        if (actualHealth <= 0)
+            killEnemy();
+    }
+
+    void killEnemy()
+    {
+        poolRappel.ReturnEnemy(this);
+
+        actualHealth = health;
+    }
+
+    public void InitEnemy()
+    {
+        actualHealth = health;
     }
 }

@@ -28,16 +28,26 @@ public class ShooterScript : MonoBehaviour
     [SerializeField]
     float _shootDelay;
 
-    private List<Transform> _enemiesTransform = new List<Transform>();
+    [SerializeField]
+    public Material[] _levels;
+
+    [SerializeField]
+    Renderer[] _indicLvl;
+
+    private int damageTower = 2;
+    public int levelTower  = 0;
+
+    private List<EnemiesScript> _enemiesScript = new List<EnemiesScript>();
 
     private IEnumerator ShootCoroutine = null;
 
-    void OnTriggerEnter(Collider col)
+
+    void OnTriggerEnter(Collider enemy)
     {
-        if(col.tag == "Enemy")
+        if (enemy.tag == "Enemy")
         {
-            _enemiesTransform.Add(col.transform);
-            if (_enemiesTransform.Count == 1 && ShootCoroutine == null)
+            _enemiesScript.Add((EnemiesScript)enemy.gameObject.GetComponent("EnemiesScript"));
+            if (_enemiesScript.Count == 1 && ShootCoroutine == null)
             {
                 ShootCoroutine = TryToShoot();
                 StartCoroutine(ShootCoroutine);
@@ -45,12 +55,12 @@ public class ShooterScript : MonoBehaviour
         }
     }
 
-    void OnTriggerExit(Collider col)
+    void OnTriggerExit(Collider enemy)
     {
-        if (col.tag == "Enemy")
+        if (enemy.tag == "Enemy")
         {
-            _enemiesTransform.Remove(col.transform);
-            if (_enemiesTransform.Count == 0 && ShootCoroutine != null)
+            _enemiesScript.Remove((EnemiesScript)enemy.gameObject.GetComponent("EnemiesScript"));
+            if (_enemiesScript.Count == 0 && ShootCoroutine != null)
             {
                 StopCoroutine(ShootCoroutine);
                 ShootCoroutine = null;
@@ -64,11 +74,10 @@ public class ShooterScript : MonoBehaviour
         {
             yield return new WaitForFixedUpdate();
 
-            if (_enemiesTransform[0].position == new Vector3(0, -5, 0))
-                _enemiesTransform.Remove(_enemiesTransform[0]);
+            if (_enemiesScript[0].transform.position == new Vector3(0, -5, 0))
+                _enemiesScript.Remove(_enemiesScript[0]);
 
-            // TEMPORAIRE !!!
-            if (_enemiesTransform.Count == 0)
+            if (_enemiesScript.Count == 0)
             {
                 StopCoroutine(ShootCoroutine);
                 ShootCoroutine = null;
@@ -82,12 +91,45 @@ public class ShooterScript : MonoBehaviour
                     ps.gameObject.SetActive(true);
 
                     ps.Transform.position = _transform.position + new Vector3(0, 2, 0);
-                    ps.Rigidbody.velocity = (_enemiesTransform[0].position - ps.Transform.position).normalized * _projectileSpeed;
+                    Vector3 Actual = _enemiesScript[0].transform.position;
+                    ps.Rigidbody.velocity = (Actual - ps.Transform.position).normalized * _projectileSpeed;
 
                     yield return new WaitForSeconds(_shootDelay);
+                    _enemiesScript[0].impactTower(damageTower);
                     _ammoShooter.ReturnProjectile(ps);
                 }
             }
+        }
+    }
+
+    public void RazLevel()
+    {
+        ChangeColor(0);
+        damageTower = 2;
+        levelTower  = 1;
+    }
+
+    public bool UpgradeTower()
+    {
+        bool result = false;
+
+        if(levelTower < 4)
+        {
+            damageTower += 2;
+            _shootDelay -= 0.2f;
+            levelTower++;
+            ChangeColor(levelTower);
+            result = true;
+        }
+
+        return result;
+    }
+
+    private void ChangeColor(int level)
+    {
+        foreach (Renderer indic in _indicLvl)
+        {
+            indic.material = _levels[level];
         }
     }
 }

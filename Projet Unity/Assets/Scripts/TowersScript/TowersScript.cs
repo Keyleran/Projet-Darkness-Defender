@@ -17,7 +17,7 @@ using System.Collections;
 public class TowersScript : MonoBehaviour 
 {
     public int id = 0;
-    public GameObject barricade = null;
+    public int id_barricade = 0;
 
     [SerializeField]
     Transform _transform;

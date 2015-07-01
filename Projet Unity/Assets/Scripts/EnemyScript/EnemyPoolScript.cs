@@ -47,7 +47,6 @@ public class EnemyPoolScript : MonoBehaviour {
             return enemy;
         }
 
-        // Si on a atteint le nombre max de barricade
         return null;
     }
 

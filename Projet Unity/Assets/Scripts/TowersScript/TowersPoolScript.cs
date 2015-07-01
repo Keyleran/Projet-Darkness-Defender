@@ -18,31 +18,32 @@ using System.Collections.Generic;
 public class TowersPoolScript : MonoBehaviour 
 {
     private List<int> idTowersUnset = new List<int>();
-    private int index = 0;
 
     [SerializeField]
-    TowersScript[] _towers;
+    public TowersScript[] _towers;
 
+    void Start()
+    {
+        int index = 0;
+        foreach (TowersScript tower in _towers)
+        {
+            tower.id = index;
+            idTowersUnset.Add(tower.id);
+            index++;
+        }
+    }
 
     // Renvoi une tour à chaque appel
-    public TowersScript GetTower(GameObject barricade)
+    public TowersScript GetTower()
     {
-        if ((idTowersUnset.Count != 0) || (index < _towers.Length))
+        if (idTowersUnset.Count != 0)
         {
             TowersScript tower = null;
-            if (idTowersUnset.Count != 0)
-            {
-                int id = idTowersUnset[0];
-                idTowersUnset.Remove(id);
-                tower = _towers[id];
-            }
-            else if (index < _towers.Length)
-            {
-                tower = _towers[index];
-                tower.id = index;
-                index++;
-            }
-            tower.barricade = barricade;
+
+            int id = idTowersUnset[0];
+            idTowersUnset.Remove(id);
+            tower = _towers[id];
+
             tower.gameObject.SetActive(true);
             return tower;
         }
@@ -51,12 +52,20 @@ public class TowersPoolScript : MonoBehaviour
         return null;
     }
 
-    public void ReturnTower(TowersScript tower)
+    public void ReturnTower(int id)
     {
-        tower.Transform.position = this.transform.position;
-        idTowersUnset.Add(tower.id);
-        tower.gameObject.SetActive(false);
-        tower.barricade.tag = "Barricade";
-        tower.barricade = null;
+        _towers[id].Transform.position = this.transform.position;
+        idTowersUnset.Add(id);
+        _towers[id].gameObject.SetActive(false);
+    }
+
+    public void Active(int id)
+    {
+        _towers[id].gameObject.SetActive(true);
+    }
+
+    public void Desactive(int id)
+    {
+        _towers[id].gameObject.SetActive(false);
     }
 }

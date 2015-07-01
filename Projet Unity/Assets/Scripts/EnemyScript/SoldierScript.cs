@@ -22,6 +22,8 @@ public class SoldierScript : MonoBehaviour
     EnemyPoolScript poolRappel;
 
     private bool raz = true;
+
+    [SerializeField]
     private int actualHealth;
     void FixedUpdate()
     {

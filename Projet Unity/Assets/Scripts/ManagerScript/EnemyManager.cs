@@ -31,9 +31,17 @@ public class EnemyManager : MonoBehaviour
     [SerializeField]
     Text _message;
 
-    public IEnumerator LaunchGame()
+    [SerializeField]
+    NetworkView _network;
+    
+    [RPC]
+    public void LaunchGameNet()
     {
-        print("Launch Game");
+        StartCoroutine(LaunchGame());
+    }
+
+    private IEnumerator LaunchGame()
+    {
         yield return StartCoroutine(spawnSoldiers(10, 1));
         yield return StartCoroutine(transition(10));
         yield return StartCoroutine(spawnSoldiers(10, 0));
@@ -62,6 +70,7 @@ public class EnemyManager : MonoBehaviour
         for(int i = 0 ; i < Number ; i++)
         {
             EnemiesScript soldier = _soldiersPool.GetEnemy();
+            soldier.InitEnemy();
             soldier.transform.position = _spawners[idSpawner].position;
             soldier.gameObject.SetActive(true);
             yield return new WaitForSeconds(1);
@@ -85,7 +94,7 @@ public class EnemyManager : MonoBehaviour
             yield return new WaitForSeconds(1);
         }
         _uiEnemies.text = "Ennemi: 0";
-        _manager.AddBuildingMoney(nbUnit * 15);
+        _network.RPC("AddMoney", RPCMode.All, nbUnit * 15);
         yield return new WaitForSeconds(5);
         _message.text = "5";
         yield return new WaitForSeconds(1);
@@ -100,4 +109,10 @@ public class EnemyManager : MonoBehaviour
         _message.text = "";
     }
 
+    [RPC]
+    void AddMoney(int money)
+    {
+        _manager.AddBuildingMoney(money);
+    }
 }
+

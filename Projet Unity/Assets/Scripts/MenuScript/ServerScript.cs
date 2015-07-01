@@ -72,7 +72,7 @@ public class ServerScript : MonoBehaviour
         _destination.gameObject.SetActive(true);
         this.gameObject.SetActive(false);
 	}	
-	
+	 
 	void Update()
 	{
 		if (isRefreshing && MasterServer.PollHostList().Length > 0)
@@ -119,7 +119,5 @@ public class ServerScript : MonoBehaviour
         _data.gameMode = "Multi";
         _destination.gameObject.SetActive(true);
         this.gameObject.SetActive(false);
-        
-        //Application.LoadLevel("New_Map");
 	} 
 }

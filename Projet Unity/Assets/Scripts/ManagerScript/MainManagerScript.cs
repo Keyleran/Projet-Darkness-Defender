@@ -22,11 +22,21 @@ public class MainManagerScript : MonoBehaviour
     [SerializeField]
     Text _message;
 
-    //private bool levelStart = false;
+    [SerializeField]
+    NetworkView _network;
+
+    int nb_player = 1;
+    int ready_player = 0;
+    private bool levelStart = false;
+
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+
+        if (Network.isClient)
+            _network.RPC("AddPlayer", RPCMode.Server);
+
         StartCoroutine(InitiateGame());
     }
 
@@ -40,6 +50,18 @@ public class MainManagerScript : MonoBehaviour
         }
     }
 
+    [RPC]
+    void AddPlayer()
+    {
+        nb_player++;
+    }
+
+    [RPC]
+    void ReadyPlayer()
+    {
+        ready_player++;
+    }
+
     IEnumerator InitiateGame()
     {
         _message.text = "Voulez-vous lancer le tutoriel ? O/N";
@@ -47,7 +69,6 @@ public class MainManagerScript : MonoBehaviour
         string key = "";
         yield return new WaitForSeconds(1);
 
-        print("choice");
         while (waitPush)
         {
             // Attendre
@@ -106,12 +127,13 @@ public class MainManagerScript : MonoBehaviour
         }
         #endregion
 
-        print("Launch");
         _message.text = "Appuyer sur \"G\" pour lancer la partie";
         yield return StartCoroutine(WaitKeyDown(KeyCode.G));
+        _network.RPC("ReadyPlayer", RPCMode.Server);
         // levelStart = true;
+        yield return StartCoroutine(WaitAllPlayer());
         _message.text = "";
-        StartCoroutine(_enemyCreator.LaunchGame());
+        _enemyCreator.LaunchGameNet();
 
     }
 
@@ -120,5 +142,14 @@ public class MainManagerScript : MonoBehaviour
     {
         while (!Input.GetKeyDown(keyCode))
             yield return null;
+    }
+
+    IEnumerator WaitAllPlayer()
+    {
+        while (ready_player != nb_player)
+        {
+            _message.text = "En attente des autres joueurs";
+            yield return null;
+        }
     }
 }
