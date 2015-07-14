@@ -229,7 +229,7 @@ public class TowerManagerScript : MonoBehaviour
                     if(Input.GetButtonDown("UpgradeMode"))
                     {
                         ShooterScript shooter = (ShooterScript)hit.collider.gameObject.GetComponent("ShooterScript");
-                        if (buildingMoney >= 100 && shooter.UpgradeTower())
+                        if (buildingMoney >= 100 && shooter.UpgradeTower(1))
                         {
                             buildingMoney -= 100;
                             _buildingMoney.text = "Matériaux: " + buildingMoney;

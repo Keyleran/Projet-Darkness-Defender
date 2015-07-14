@@ -109,15 +109,16 @@ public class ShooterScript : MonoBehaviour
         levelTower  = 1;
     }
 
-    public bool UpgradeTower()
+    public bool UpgradeTower(int level)
     {
         bool result = false;
+		int upgradeDamage = level - levelTower;
 
         if(levelTower < 4)
         {
-            damageTower += 2;
-            _shootDelay -= 0.2f;
-            levelTower++;
+			damageTower += 2 * upgradeDamage;
+			_shootDelay -= 0.2f * upgradeDamage;
+			levelTower += upgradeDamage;
             ChangeColor(levelTower);
             result = true;
         }
