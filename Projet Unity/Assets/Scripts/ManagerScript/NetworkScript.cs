@@ -45,7 +45,13 @@ public class NetworkScript : MonoBehaviour
     [SerializeField]
     TowerManagerScript towerScript;
 
-    void Start()
+    [SerializeField]
+    MainManagerScript ManagerScript;
+
+    [SerializeField]
+    NetworkView _network;
+
+    void Start() 
     {
         GameObject Network_Data = GameObject.Find("Network_Data");
         _data = (Data_keeper) Network_Data.GetComponent("Data_keeper");
@@ -61,7 +67,7 @@ public class NetworkScript : MonoBehaviour
 
     void Update()
     {
-        if (isRefreshingHostList && MasterServer.PollHostList().Length > 0)
+        if (isRefreshingHostList && MasterServer.PollHostList().Length > 0 && ManagerScript.levelStart == false)
         {
             isRefreshingHostList = false;
             hostList = MasterServer.PollHostList();
@@ -82,11 +88,18 @@ public class NetworkScript : MonoBehaviour
         {
             Network.Connect(_data.hostData);
         }
-    }
+    } 
 
     void OnServerInitialized()
     {
         SpawnPlayer();
+        ManagerScript.AddPlayer();
+    }
+
+    [RPC]
+    void PlayerConnected()
+    {
+        ManagerScript.AddPlayer();
     }
 
     void OnConnectedToServer()
@@ -94,10 +107,11 @@ public class NetworkScript : MonoBehaviour
         SpawnPlayer();
         Debug.Log("Server Joined");
     }
-
+       
     private void SpawnPlayer()
     {
         Network.Instantiate(playerPrefab, new Vector3(0f, 0f, 0f), Quaternion.identity, 0);
+        _network.RPC("PlayerConnected", RPCMode.Server);
     }
 
     void OnMasterServerEvent(MasterServerEvent msEvent)

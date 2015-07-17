@@ -28,7 +28,7 @@ public class PlayerManagerScript : MonoBehaviour
     {
 
         _players[index].transform.position = _spawnPlayer.position;
-        _players[index].playerId = index;
+        _players[index].idPlayer = index;
         index++;
 
         _players[index].gameObject.SetActive(true);

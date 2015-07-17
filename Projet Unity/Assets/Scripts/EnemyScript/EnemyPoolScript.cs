@@ -18,32 +18,39 @@ using System.Collections.Generic;
 public class EnemyPoolScript : MonoBehaviour {
 
     private List<int> idEnemiesUnset = new List<int>();
-    private int index = 0;
 
     [SerializeField]
-    EnemiesScript[] _enemies;
+    public EnemiesScript[] _enemies;
+
+    [SerializeField]
+    NetworkView _network;
 
     public int countEnemiesUse = 0; // Nombre d'enemis libérés par la pool
+
+    void Start()
+    {
+        int index = 0;
+        foreach (EnemiesScript enemy in _enemies)
+        {
+            enemy.id = index;
+            idEnemiesUnset.Add(enemy.id);
+            index++;
+        }
+    }
 
     // Renvoi une tour à chaque appel
     public EnemiesScript GetEnemy()
     {
         countEnemiesUse++;
-        if ((idEnemiesUnset.Count != 0) || (index < _enemies.Length))
+        if (idEnemiesUnset.Count != 0)
         {
             EnemiesScript enemy = null;
-            if (idEnemiesUnset.Count != 0)
-            {
-                int id = idEnemiesUnset[0];
-                idEnemiesUnset.Remove(id);
-                enemy = _enemies[id];
-            }
-            else if (index < _enemies.Length)
-            {
-                enemy = _enemies[index];
-                enemy.id = index;
-                index++;
-            }
+
+            int id = idEnemiesUnset[0];
+            idEnemiesUnset.Remove(id);
+            enemy = _enemies[id];
+
+            enemy.gameObject.SetActive(true);
             return enemy;
         }
 
@@ -52,16 +59,33 @@ public class EnemyPoolScript : MonoBehaviour {
 
     // ----------
     //
-    // Fonction retour de l'unité enemie à la pool
+    // Fonctions retour de l'unité enemie à la pool
     //
     // ----------
-    public void ReturnEnemy(EnemiesScript enemy)
+    public void ReturnEnemy(int id)
+    {
+        if (Network.isServer)
+        {
+            idEnemiesUnset.Add(_enemies[id].id); // Retire l'objet de la liste des projectiles utilisés
+            _network.RPC("ReturnEnemyRPC", RPCMode.All, id);
+        }
+    }
+
+    [RPC]
+    public void ReturnEnemyRPC(int id)
     {
         countEnemiesUse--;
+        _enemies[id].Transform.position = this.transform.position; // Replace le projectile dans la pool
+        _enemies[id].gameObject.SetActive(false); // Désactive le gameobject
+    }
 
-        enemy.Transform.position = this.transform.position; // Replace le projectile dans la pool
-        idEnemiesUnset.Add(enemy.id); // Retire l'objet de la liste des projectiles utilisés
+    public void Active(int id)
+    {
+        _enemies[id].gameObject.SetActive(true);
+    }
 
-        enemy.gameObject.SetActive(false); // Désactive le gameobject
+    public void Desactive(int id)
+    {
+        _enemies[id].gameObject.SetActive(false);
     }
 }

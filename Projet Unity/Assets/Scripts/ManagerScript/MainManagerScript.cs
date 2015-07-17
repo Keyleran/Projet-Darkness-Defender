@@ -14,8 +14,11 @@ using System.Collections;
 // Script Manager: Gére le jeu
 // 
 // --------------------------------------------------
-public class MainManagerScript : MonoBehaviour 
+public class MainManagerScript : MonoBehaviour
 {
+    private string ancientMessage = "";
+    private float gameState = 1;
+
     [SerializeField]
     EnemyManager _enemyCreator;
 
@@ -25,17 +28,19 @@ public class MainManagerScript : MonoBehaviour
     [SerializeField]
     NetworkView _network;
 
-    int nb_player = 1;
+    [SerializeField]
+    TowerManagerScript TowerManager;
+
+    public bool levelStart = false;
+
+    int nb_player = 0;
     int ready_player = 0;
-    private bool levelStart = false;
 
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
 
-        if (Network.isClient)
-            _network.RPC("AddPlayer", RPCMode.Server);
 
         StartCoroutine(InitiateGame());
     }
@@ -48,15 +53,84 @@ public class MainManagerScript : MonoBehaviour
             Cursor.visible = true;
             Application.LoadLevel("Menu");
         }
-    }
 
-    [RPC]
-    void AddPlayer()
+        if (Input.GetButtonDown("Pause"))
+        {
+            print("pauseAsked");
+            _network.RPC("PauseRestartGame", RPCMode.All);
+        }
+    }
+    
+    public void AddPlayer()
     {
-        nb_player++;
+        SetId();
+        _network.RPC("NewPlayer", RPCMode.All, nb_player);
     }
 
     [RPC]
+    void NewPlayer(int ActualNb_player)
+    {
+        GameObject[] PlayersFind = GameObject.FindGameObjectsWithTag("Player");
+
+        if(nb_player == 0)
+        {
+            GameObject[] Players = new GameObject[10];
+            PlayerScript[] PlayersScript = new PlayerScript[10];
+
+            PlayerScript initPlayer = (PlayerScript)PlayersFind[0].GetComponent("PlayerScript");
+            initPlayer.idPlayer = ActualNb_player;
+            initPlayer.init = true;
+
+            Players[ActualNb_player] = PlayersFind[0];
+            PlayersScript[ActualNb_player] = initPlayer;
+            TowerManager._player = ActualNb_player;
+            TowerManager.ciblePlayer = PlayersScript[ActualNb_player];
+
+            for (int i = 0; i < ActualNb_player; i++)
+            {
+                initPlayer = (PlayerScript)PlayersFind[i+1].GetComponent("PlayerScript");
+                initPlayer.idPlayer = i;
+                initPlayer.init = true;
+
+                Players[i] = PlayersFind[i+1];
+                PlayersScript[i] = initPlayer;
+            }
+
+            _enemyCreator.Players = Players;
+            _enemyCreator.PlayersScript = PlayersScript;
+
+        }
+        else
+        {
+            PlayerScript initPlayer = (PlayerScript)PlayersFind[ActualNb_player].GetComponent("PlayerScript");
+            initPlayer.idPlayer = ActualNb_player;
+            initPlayer.init = true;
+
+            _enemyCreator.Players[ActualNb_player] = PlayersFind[ActualNb_player];
+            _enemyCreator.PlayersScript[ActualNb_player] = initPlayer;
+        }
+        nb_player = ActualNb_player + 1;
+        _enemyCreator.nb_player = nb_player;
+    } 
+
+    void SetId()
+    {
+        print("id: " + nb_player);
+        foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
+        {
+            print("test");
+            PlayerScript initPlayer = (PlayerScript)player.GetComponent("PlayerScript");
+
+            if(initPlayer.init == false)
+            {
+                initPlayer.idPlayer = nb_player;
+                print(nb_player);
+                initPlayer.init = true;
+            }
+        }  
+    }
+
+    [RPC] 
     void ReadyPlayer()
     {
         ready_player++;
@@ -129,19 +203,35 @@ public class MainManagerScript : MonoBehaviour
 
         _message.text = "Appuyer sur \"G\" pour lancer la partie";
         yield return StartCoroutine(WaitKeyDown(KeyCode.G));
-        _network.RPC("ReadyPlayer", RPCMode.Server);
-        // levelStart = true;
+        _network.RPC("ReadyPlayer", RPCMode.All);
         yield return StartCoroutine(WaitAllPlayer());
         _message.text = "";
-        _enemyCreator.LaunchGameNet();
+        levelStart = true;
+
+        if(Network.isServer)
+            _enemyCreator.LaunchGameNet();
 
     }
 
-
     IEnumerator WaitKeyDown(KeyCode keyCode)
     {
+        if (Input.GetKeyDown(keyCode))
+            while (!Input.GetKeyUp(keyCode))
+                yield return null;
+
         while (!Input.GetKeyDown(keyCode))
             yield return null;
+    }
+
+    IEnumerator WaitKeyPause()
+    {
+        if (Input.GetKeyDown(KeyCode.P))
+            while (!Input.GetKeyUp(KeyCode.P))
+                yield return null;
+
+        while (!Input.GetKeyDown(KeyCode.P))
+            yield return null;
+        _network.RPC("PauseRestartGame", RPCMode.All);
     }
 
     IEnumerator WaitAllPlayer()
@@ -151,5 +241,25 @@ public class MainManagerScript : MonoBehaviour
             _message.text = "En attente des autres joueurs";
             yield return null;
         }
+    }
+
+    [RPC]
+    void PauseRestartGame()
+    {
+        gameState = gameState == 1 ? 0 : 1;
+        print(gameState);
+        if (gameState == 0)
+        {
+            ancientMessage = _message.text;
+            _message.text = "Jeu en Pause !\n";
+            StartCoroutine(WaitKeyPause());
+        }
+        else
+        {
+            _message.text = ancientMessage;
+            StopCoroutine(WaitKeyPause());
+        }
+
+        Time.timeScale = gameState;
     }
 }

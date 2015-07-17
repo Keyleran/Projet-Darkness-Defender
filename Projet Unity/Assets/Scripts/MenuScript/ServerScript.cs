@@ -14,6 +14,9 @@ public class ServerScript : MonoBehaviour
 {
 	private const string typeName = "DarknessDefender";
     private string gameName = "Darkness Defender";
+
+	private string gameType = "";
+	private string difficulty = "";
 	
 	private bool isRefreshing = false;
 	private HostData[] hostList;
@@ -21,35 +24,28 @@ public class ServerScript : MonoBehaviour
 	[SerializeField]
 	GameObject _parent;
 
+	[SerializeField]
+	GameObject _destination;
+
     [SerializeField]
     GameObject _name;
 
     [SerializeField]
     Data_keeper _data;
-
-	[SerializeField]
-	public GUISkin Skin_Button;
-
-	[SerializeField]
-	public GUISkin Skin_Server;
-
+	
 	void OnGUI()
 	{
 		if (!Network.isClient && !Network.isServer)
 		{
-			GUI.skin = Skin_Button;
-
-			if (GUI.Button(new Rect(70, 100, 160, 100), "Démarrer un serveur"))
+			if (GUI.Button(new Rect(70, 100, 150, 80), "Démarrer un serveur"))
 			{
 				_name.SetActive(true);
 				this.gameObject.SetActive(false);
 			}
 			
-			if (GUI.Button(new Rect(70, 200, 160, 100), "Rafraichir"))
+			if (GUI.Button(new Rect(70, 200, 150, 80), "Rafraichir"))
 				RefreshHostList();
-
-			GUI.skin = Skin_Server;
-
+			
 			if (hostList != null)
 			{
 				for (int i = 0; i < hostList.Length; i++)
@@ -59,7 +55,7 @@ public class ServerScript : MonoBehaviour
 				}
 			}
 
-			if (GUI.Button(new Rect(500, 460, 100, 40), "Retour"))
+			if (GUI.Button(new Rect(500, 500, 120, 50), "Retour"))
 			{
 				this.gameObject.SetActive(false);
 				_parent.SetActive(true);
@@ -73,8 +69,8 @@ public class ServerScript : MonoBehaviour
 		//string name = gameName + " / " + gameType + " / " + difficulty;
 
         _data.isServer = true;
-		Application.LoadLevel ("New_Map");
-		this.gameObject.SetActive(false);
+        _destination.gameObject.SetActive(true);
+        this.gameObject.SetActive(false);
 	}	
 	 
 	void Update()
@@ -95,6 +91,19 @@ public class ServerScript : MonoBehaviour
 		}
 	}
 
+	public void TypeGame(string gameMode)
+	{
+        _data.gameType = gameMode;
+        gameType = gameMode;
+		Debug.Log(gameType);
+	}
+
+	public void Difficulty(string chosenDifficulty)
+	{
+        _data.difficulty = chosenDifficulty;
+        difficulty = chosenDifficulty;
+	}
+
 	public void SetName(string name)
 	{
         _data.gameName = name;
@@ -108,7 +117,7 @@ public class ServerScript : MonoBehaviour
         _data.hostData = hostData;
         _data.isServer = false;
         _data.gameMode = "Multi";
-		Application.LoadLevel ("New_Map");
-		this.gameObject.SetActive(false);
+        _destination.gameObject.SetActive(true);
+        this.gameObject.SetActive(false);
 	} 
 }

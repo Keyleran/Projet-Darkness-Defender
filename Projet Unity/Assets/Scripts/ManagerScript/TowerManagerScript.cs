@@ -35,7 +35,11 @@ public class TowerManagerScript : MonoBehaviour
     private int constructChoose = 0;
     private int buildingMoney   = 600;
     private Vector3 lastCursor  = new Vector3(0, 0, 0);
-    private int _player;
+    public int _player;
+    bool coroutineState = false;
+    private IEnumerator coConstruction;
+    bool access = false;
+
     MuninAlgo Munin;
 
     [SerializeField]
@@ -107,150 +111,26 @@ public class TowerManagerScript : MonoBehaviour
     [SerializeField]
     NetworkView network;
 
+    [SerializeField]
+    public PlayerScript ciblePlayer;
+
+    private Vector3 oldPosition;
+    bool constructionWait = true;
+
     void Start()
     {
         _ChoosenTowerFont.color = new Color(255, 255, 255, 0);
 
+        coConstruction = Construction();
 
         #region Initialisation Alogorithme de Munin
-        // X: -36 -> 40
-        // Z: -30 -> 30
-        int i = 0;
-        int j = 0;
-
-        Munin = new MuninAlgo();
-
-        for (int x = -50; x <= 50; x += 2)
-        {
-            for(int z = -40; z <= 40; z += 2)
-            {
-                NavMeshPath path = new NavMeshPath(); 
-                _gridMaker.CalculatePath(new Vector3(x, 0, z), path);
-                if (path.status == NavMeshPathStatus.PathComplete)
-                {
-                    Munin.GridMapping.Add(x.ToString() + ":" + z.ToString(), 'G');
-                    i++;
-                }
-                else
-                {
-                    Munin.GridMapping.Add(x.ToString() + ":" + z.ToString(), 'W');
-                    j++; 
-                }
-
-                Munin.GridState.Add(x.ToString() + ":" + z.ToString(), 0);
-            }
-        }
-        Debug.Log("Access: " + i + ", Denied: " + j);
-
+        Munin = new MuninAlgo(_gridMaker);
         Munin.InitiateGrid();
         #endregion
     }
      
     void FixedUpdate()
     {
-        if (Network.isClient)
-            _player = 1;
-        else
-            _player = 0;
-
-        if (constructMode)
-        {
-            // Pointeur - Permet de positioner un sample ou une tour à l'endroit où le curseur pointe
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit = new RaycastHit();
-
-            if ((Physics.Raycast(ray, out hit)))
-            {
-                float positionX = 0, positionY = 0, positionZ = 0;
-
-                positionX = roundNumber(hit.point.x);
-                positionY = roundNumber(hit.point.y);
-                positionZ = roundNumber(hit.point.z);
-
-                #region SAMPLES
-                _samplesPoolScript.ReturnSample();
-
-                // Sample = Aperçu, permet de voir où seront placés les élèments
-                // Le code semble identique, mais il permet de ne pas afficher une barricade sur une autre barricade
-                if ((hit.collider.tag == "Ground") && (constructChoose == 0))
-                {
-                    // Récupère les coordonnées de l'objet visé
-
-                    if (Munin.accessRequest(positionX, positionZ))
-                    {
-                        Color new_color = _sampleMatChange[0].color;
-                        _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
-                    }
-                    else
-                    {
-                        Color new_color = _sampleMatChange[1].color;
-                        _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
-                    }
-
-                    SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
-                    sample.Transform.position = new Vector3(positionX, positionY, positionZ);
-                }
-                else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
-                {
-                    Color new_color = _sampleMatChange[0].color;
-                    _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
-                    positionX = hit.transform.position.x;
-                    positionY = hit.transform.position.y + 0.5f;
-                    positionZ = hit.transform.position.z;
-
-                    SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
-                    sample.Transform.position = new Vector3(positionX, positionY, positionZ);
-                }
-                #endregion
-
-                // Si le joueur clique, acheter une tour
-                if (Input.GetMouseButtonDown(0))
-                {
-                    if (hit.collider.tag == "Ground")
-                    {
-                        if (Network.isServer)
-                            BuyBar(new Vector3(positionX, positionY, positionZ), buildingMoney, 0);
-                        else
-                            network.RPC("BuyBar", RPCMode.Server, new Vector3(positionX, positionY, positionZ), buildingMoney, _player);
-                    }
-                    else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
-                    {
-                        int id_bar = ((BarricadeScript)hit.collider.gameObject.GetComponent("BarricadeScript")).id;
-                        if (Network.isServer)
-                            BuyTower(new Vector3(positionX, positionY, positionZ), id_bar, constructChoose, buildingMoney, 0);
-                        else
-                            network.RPC("BuyTower", RPCMode.Server, new Vector3(positionX, positionY, positionZ), id_bar, constructChoose, buildingMoney, _player);
-                    }
-                }
-
-                // Si le joueur appui sur U, améliorer une tour
-                if((hit.collider.tag == "Shooter") && (constructChoose > 0))
-                {
-                    if(Input.GetButtonDown("UpgradeMode"))
-                    {
-                        ShooterScript shooter = (ShooterScript)hit.collider.gameObject.GetComponent("ShooterScript");
-                        if (buildingMoney >= 100 && shooter.UpgradeTower(1))
-                        {
-                            buildingMoney -= 100;
-                            _buildingMoney.text = "Matériaux: " + buildingMoney;
-                        }
-                    }
-                }
-            }
-        }
-
-        // Touche "E" par défaut, permet de vendre une tour/barricade
-        if (Input.GetButtonDown("SellTower"))
-        {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit = new RaycastHit();
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                SellTower(hit);
-            }            
-        }
-
         // Touche "A" par défaut, permet de passer en mode contruction
         if (Input.GetButtonDown("ConstructMode"))
         {
@@ -267,6 +147,12 @@ public class TowerManagerScript : MonoBehaviour
         #region Choix de la tour à construire
         if (constructMode)
         {
+            if (!coroutineState)
+            {
+                StartCoroutine(coConstruction);
+                coroutineState = true;
+            }
+
             _ChoosenTowerFont.color = new Color(255, 255, 255, 255);
             if (Input.GetButtonDown("SelectBarricade"))
             {
@@ -343,8 +229,151 @@ public class TowerManagerScript : MonoBehaviour
         else
         {
             RazUITowers();
+            if (coroutineState)
+            {
+                StopCoroutine(coConstruction);
+                coroutineState = false;
+            }
         }
         #endregion
+    }
+
+    IEnumerator Construction()
+    {
+        while(true)
+        {
+            yield return new WaitForFixedUpdate();
+
+            // Pointeur - Permet de positioner un sample ou une tour à l'endroit où le curseur pointe
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            RaycastHit hit = new RaycastHit();
+
+            if ((Physics.Raycast(ray, out hit)))
+            {
+                float positionX = 0, positionY = 0, positionZ = 0;
+
+                positionX = roundNumber(hit.point.x);
+                positionY = roundNumber(hit.point.y);
+                positionZ = roundNumber(hit.point.z);
+
+                #region SAMPLES
+                _samplesPoolScript.ReturnSample();
+
+                // Sample = Aperçu, permet de voir où seront placés les élèments
+                // Le code semble identique, mais il permet de ne pas afficher une barricade sur une autre barricade
+                if ((hit.collider.tag == "Ground") && (constructChoose == 0))
+                {
+                    // Récupère les coordonnées de l'objet visé
+                    Vector3 position = new Vector3(positionX, positionY, positionZ);
+                    if (oldPosition != position || constructionWait)
+                    {
+                        yield return new WaitForFixedUpdate();
+                        constructionWait = false;
+                        oldPosition = position;
+                        access = Munin.accessRequest(positionX, positionZ, ciblePlayer.transform.position);
+                        if (access)
+                        {
+                            Color new_color = _sampleMatChange[0].color;
+                            _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
+                        }
+                        else
+                        {
+                            Color new_color = _sampleMatChange[1].color;
+                            _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
+                        }
+                    }
+                    SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
+                    sample.Transform.position = new Vector3(oldPosition.x, oldPosition.y, oldPosition.z);
+                }
+                else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
+                {
+                    Color new_color = _sampleMatChange[0].color;
+                    _sampleMat.color = new Color(new_color.r, new_color.g, new_color.b);
+                    positionX = hit.transform.position.x;
+                    positionY = hit.transform.position.y + 0.5f;
+                    positionZ = hit.transform.position.z;
+
+                    SamplesScript sample = _samplesPoolScript.GetSample(constructChoose);
+                    sample.Transform.position = new Vector3(positionX, positionY, positionZ);
+                }
+                #endregion
+
+                // Si le joueur clique, acheter une tour
+                if (Input.GetMouseButtonDown(0))
+                {
+                    yield return WaitMouseUp();
+                    if ((hit.collider.tag == "Ground") && access)
+                    {
+                        constructionWait = true;
+                        if (Network.isServer)
+                            BuyBar(new Vector3(oldPosition.x, oldPosition.y, oldPosition.z), buildingMoney, 0);
+                        else
+                            network.RPC("BuyBar", RPCMode.Server, new Vector3(oldPosition.x, oldPosition.y, oldPosition.z), buildingMoney, _player);
+                    }
+                    else if ((hit.collider.tag == "Barricade") && (constructChoose > 0))
+                    {
+                        int id_bar = ((BarricadeScript)hit.collider.gameObject.GetComponent("BarricadeScript")).id;
+                        if (Network.isServer)
+                            BuyTower(new Vector3(positionX, positionY, positionZ), id_bar, constructChoose, buildingMoney, 0);
+                        else
+                            network.RPC("BuyTower", RPCMode.Server, new Vector3(positionX, positionY, positionZ), id_bar, constructChoose, buildingMoney, _player);
+                    }
+                }
+
+                // Si le joueur appui sur U, améliorer une tour
+                if ((hit.collider.tag == "Shooter") && (constructChoose > 0))
+                {
+                    if (Input.GetButtonDown("UpgradeMode"))
+                    {
+                        yield return WaitKeyUp("UpgradeMode");
+                    
+                        if (buildingMoney >= 100)
+                        {
+                            TowersScript tower = ((TowersScript)hit.collider.gameObject.GetComponent("TowersScript"));
+                            ShooterScript shooter = (ShooterScript)hit.collider.gameObject.GetComponent("ShooterScript");
+
+                            if (shooter.levelTower < 4)
+                            {
+                                network.RPC("UpgrageTower", RPCMode.All, tower.id, "Shooter");
+
+                                buildingMoney -= 100;
+                                _buildingMoney.text = "Matériaux: " + buildingMoney;
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Touche "E" par défaut, permet de vendre une tour/barricade
+            if (Input.GetButtonDown("SellTower"))
+            {
+                yield return WaitKeyUp("SellTower");
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    SellTower(hit);
+                }
+            }
+        }
+    }
+
+    IEnumerator WaitKeyUp(string keyCode)
+    {
+        if (Input.GetButtonUp(keyCode))
+            while (!Input.GetButtonDown(keyCode))
+                yield return null;
+
+        while (!Input.GetButtonUp(keyCode))
+            yield return null;
+    }
+    IEnumerator WaitMouseUp()
+    {
+        if (Input.GetMouseButtonUp(0))
+            while (!Input.GetMouseButtonDown(0))
+                yield return null;
+
+        while (!Input.GetMouseButtonUp(0))
+            yield return null;
     }
 
     float roundNumber(float value)
@@ -370,16 +399,19 @@ public class TowerManagerScript : MonoBehaviour
     [RPC]
     void BuyBar(Vector3 position, int BuildingMon, int id_player)
     {
-        BarricadeScript bar = _barricadePoolScript.GetBarricade();
-        if ((bar != null) && (BuildingMon - 50 >= 0))
+        if (Network.isServer)
         {
-            bar.Transform.position = position;
-            network.RPC("ActiveBar", RPCMode.All, bar.id);
-            network.RPC("ModifMoney", RPCMode.All, id_player, -50);
-        }
-        else
-        {
-            print("Barricade Limit Reach");
+            BarricadeScript bar = _barricadePoolScript.GetBarricade();
+            if ((bar != null) && (BuildingMon - 50 >= 0))
+            {
+                network.RPC("ActiveBar", RPCMode.All, bar.id, position);
+                network.RPC("UpdateMunin", RPCMode.All, position, "B");
+                network.RPC("ModifMoney", RPCMode.All, id_player, -50);
+            }
+            else
+            {
+                print("Barricade Limit Reach");
+            }
         }
     }
 
@@ -443,8 +475,7 @@ public class TowerManagerScript : MonoBehaviour
 
         if (tower != null)
         {
-            tower.Transform.position = position;
-            network.RPC("ActiveTower", RPCMode.All, tower.id, id_bar, constructChoose);
+            network.RPC("ActiveTower", RPCMode.All, tower.id, id_bar, constructChoose, position);
             network.RPC("ModifMoney", RPCMode.All, id_player, money);
             network.RPC("UpdateBar", RPCMode.All, id_bar);
         }
@@ -472,14 +503,16 @@ public class TowerManagerScript : MonoBehaviour
         {
             case "Barricade":
                 id = ((BarricadeScript) hit.collider.gameObject.GetComponent("BarricadeScript")).id;
+                Vector3 position = hit.collider.gameObject.transform.position;
+                network.RPC("UpdateMunin", RPCMode.All, position, "G");
                 network.RPC("SellTowerNetwork", RPCMode.All, "Barricade", id);
                 ModifMoney(_player, 50);
                 break;
             case "Shooter":
                 TowersScript tower = ((TowersScript)hit.collider.gameObject.GetComponent("TowersScript"));
+                ModifMoney(_player, 100 * (((ShooterScript) hit.collider.gameObject.GetComponent("ShooterScript")).levelTower + 1));
                 network.RPC("SellTowerNetwork", RPCMode.All, "Shooter", tower.id);
                 network.RPC("UpdateBar", RPCMode.All, tower.id_barricade);
-                ModifMoney(_player, 100 * (((ShooterScript) hit.collider.gameObject.GetComponent("ShooterScript")).levelTower));
                 break;
             case "Canon":
                 buildingMoney += 150;
@@ -533,9 +566,9 @@ public class TowerManagerScript : MonoBehaviour
     }
 
     [RPC]
-    void ActiveBar(int id)
+    void ActiveBar(int id, Vector3 position)
     {
-       _barricadePoolScript.Active(id);
+        _barricadePoolScript.Active(id, position);
     }
 
     [RPC]
@@ -545,31 +578,31 @@ public class TowerManagerScript : MonoBehaviour
     }
 
     [RPC]
-    void ActiveTower(int id, int id_bar, int type)
+    void ActiveTower(int id, int id_bar, int type, Vector3 position)
     {
         switch(type)
         {
             case Constants.Shooter:
-                _shooterPoolScript.Active(id);
+                _shooterPoolScript.Active(id, position);
                 _shooterPoolScript._towers[id].id_barricade = id_bar;
                 break;
             case Constants.Canon:
-                _canonPoolScript.Active(id);
+                _canonPoolScript.Active(id, position);
                 break;
             case Constants.Fire:
-                _firePoolScript.Active(id);
+                _firePoolScript.Active(id, position);
                 break;
             case Constants.Ice:
-                _icePoolScript.Active(id);
+                _icePoolScript.Active(id, position);
                 break;
             case Constants.Poison:
-                _magicPoolScript.Active(id);
+                _magicPoolScript.Active(id, position);
                 break;
             case Constants.Magic:
-                _magicPoolScript.Active(id);
+                _magicPoolScript.Active(id, position);
                 break;
             case Constants.Detector:
-                _detectorPoolScript.Active(id);
+                _detectorPoolScript.Active(id, position);
                 break;
         }
     }
@@ -617,15 +650,48 @@ public class TowerManagerScript : MonoBehaviour
     [RPC]
     void SellTowerNetwork(string Type, int id)
     {
-        switch (Type)
+        if (Network.isServer)
         {
-            case "Barricade":
-                _barricadePoolScript.ReturnBarricade(id);
-                break;
+            switch (Type)
+            {
+                case "Barricade":
+                    _barricadePoolScript.ReturnBarricade(id);
+                    break;
+                case "Shooter":
+                    _shooterPoolScript.ReturnTower(id);
+                    ShooterScript shooter = (ShooterScript)_shooterPoolScript._towers[id].gameObject.GetComponent("ShooterScript");
+                    shooter.RazLevel();
+                    break;
+                case "Canon":
+                    break;
+                case "Fire":
+                    break;
+                case "Ice":
+                    break;
+                case "Poison":
+                    break;
+                case "Magic":
+                    break;
+                case "Detector":
+                    break;
+            }
+        }
+    }
+
+    [RPC]
+    void UpdateMunin(Vector3 position, string state)
+    {
+        Munin.GridMapping[position.x.ToString() + ":" + position.z.ToString()] = state.ToCharArray()[0];
+    }
+
+    [RPC]
+    void UpgrageTower(int id, string type)
+    {
+        switch (type)
+        {
             case "Shooter":
-                _shooterPoolScript.ReturnTower(id);
                 ShooterScript shooter = (ShooterScript)_shooterPoolScript._towers[id].gameObject.GetComponent("ShooterScript");
-                shooter.RazLevel();
+                shooter.UpgradeTower();
                 break;
             case "Canon":
                 break;

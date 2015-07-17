@@ -46,6 +46,7 @@ public class BarricadePoolScript : MonoBehaviour
             barricade = _barricade[id];
 
             barricade.gameObject.SetActive(true);
+            barricade.tag = "Barricade";
             return barricade;
         }
 
@@ -60,8 +61,9 @@ public class BarricadePoolScript : MonoBehaviour
         _barricade[id].gameObject.SetActive(false);
     }
 
-    public void Active(int id)
+    public void Active(int id, Vector3 position)
     {
+        _barricade[id].Transform.position = position;
         _barricade[id].gameObject.SetActive(true);
     }
 

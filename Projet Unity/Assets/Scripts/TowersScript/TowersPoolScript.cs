@@ -59,13 +59,15 @@ public class TowersPoolScript : MonoBehaviour
         _towers[id].gameObject.SetActive(false);
     }
 
-    public void Active(int id)
+    public void Active(int id, Vector3 position)
     {
+        _towers[id].Transform.position = position;
         _towers[id].gameObject.SetActive(true);
     }
 
     public void Desactive(int id)
     {
+        _towers[id].Transform.position = this.transform.position;
         _towers[id].gameObject.SetActive(false);
     }
 }

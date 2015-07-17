@@ -33,8 +33,12 @@ public class EnemyManager : MonoBehaviour
 
     [SerializeField]
     NetworkView _network;
+
+
+    public GameObject[] Players;
+    public PlayerScript[] PlayersScript = new PlayerScript[10];
+    public int nb_player = 0;
     
-    [RPC]
     public void LaunchGameNet()
     {
         StartCoroutine(LaunchGame());
@@ -42,45 +46,86 @@ public class EnemyManager : MonoBehaviour
 
     private IEnumerator LaunchGame()
     {
-        yield return StartCoroutine(spawnSoldiers(10, 1));
-        yield return StartCoroutine(transition(10));
-        yield return StartCoroutine(spawnSoldiers(10, 0));
-        yield return StartCoroutine(transition(10));
-        StartCoroutine(spawnSoldiers(8, 0));
-        yield return StartCoroutine(spawnSoldiers(8, 1));
-        yield return StartCoroutine(transition(16));
-        StartCoroutine(spawnSoldiers(16, 0));
-        yield return StartCoroutine(spawnSoldiers(16, 1));
-
-        // Fin du niveau
-        while (_soldiersPool.countEnemiesUse != 0)
+        if(Network.isServer)
         {
-            if (_soldiersPool.countEnemiesUse == 1)
-                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
-            else
-                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
 
-            yield return new WaitForSeconds(1);
+            // Wave 1
+            int randTarget = Random.Range(0, nb_player);
+            yield return StartCoroutine(spawnSoldiers(10, 1, randTarget));
+            _network.RPC("LaunchTranstion", RPCMode.Others, 10);
+            yield return StartCoroutine(transition(10));
+
+            // Wave 2
+            randTarget = Random.Range(0, nb_player);
+            yield return StartCoroutine(spawnSoldiers(10, 0, randTarget));
+            _network.RPC("LaunchTranstion", RPCMode.Others, 10);
+            yield return StartCoroutine(transition(10));
+
+            // Wave 3
+            randTarget = Random.Range(0, nb_player);
+            StartCoroutine(spawnSoldiers(8, 0, randTarget));
+            yield return StartCoroutine(spawnSoldiers(8, 1, randTarget));
+            _network.RPC("LaunchTranstion", RPCMode.Others, 16);
+            yield return StartCoroutine(transition(16));
+
+            // Wave 4
+            randTarget = Random.Range(0, nb_player);
+            StartCoroutine(spawnSoldiers(16, 0, randTarget));
+            yield return StartCoroutine(spawnSoldiers(16, 1, randTarget));
+            _network.RPC("LaunchTranstion", RPCMode.Others, 32);
+            yield return StartCoroutine(transition(32));
+
+
+            /*
+            // Fin du niveau
+            while (_soldiersPool.countEnemiesUse != 0)
+            {
+                if (_soldiersPool.countEnemiesUse == 1)
+                    _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
+                else
+                    _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
+
+                yield return new WaitForSeconds(1);
+            }
+            _message.text = "Victoire !";*/
         }
-        _message.text = "Victoire !";
     }
-     
-    public IEnumerator spawnSoldiers(int Number, int idSpawner)
-    {
-        for(int i = 0 ; i < Number ; i++)
-        {
-            EnemiesScript soldier = _soldiersPool.GetEnemy();
-            soldier.InitEnemy();
-            soldier.transform.position = _spawners[idSpawner].position;
-            soldier.gameObject.SetActive(true);
-            yield return new WaitForSeconds(1);
 
-            if (_soldiersPool.countEnemiesUse == 1)
-                _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
-            else
-                _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
+    [RPC]
+    public void InitSoldier(int Number, int idSpawner, int Target, int idSoldier)
+    {
+        EnemiesScript soldier = _soldiersPool._enemies[idSoldier];
+        soldier.InitEnemy();
+        soldier.transform.position = _spawners[idSpawner].position;
+        soldier.SetTarget(Players[Target], PlayersScript[Target]);
+        soldier.gameObject.SetActive(true);
+        _soldiersPool.countEnemiesUse++;
+
+        if (_soldiersPool.countEnemiesUse == 1)
+            _uiEnemies.text = "Ennemi: " + _soldiersPool.countEnemiesUse;
+        else
+            _uiEnemies.text = "Ennemis: " + _soldiersPool.countEnemiesUse;
+    }
+
+    [RPC]
+    public void LaunchTranstion(int Number)
+    {
+        StartCoroutine(transition(Number));
+    }
+
+    public IEnumerator spawnSoldiers(int Number, int idSpawner, int Target)
+    {
+        if (Network.isServer)
+        {
+            for (int i = 0; i < Number; i++)
+            {
+                EnemiesScript soldier = _soldiersPool.GetEnemy();
+                _network.RPC("InitSoldier", RPCMode.All, Number, idSpawner, Target, soldier.id);
+
+                yield return new WaitForSeconds(1);
+            }
         }
-    } 
+    }
 
     public IEnumerator transition(int nbUnit)
     {

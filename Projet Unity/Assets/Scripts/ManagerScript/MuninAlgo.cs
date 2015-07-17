@@ -9,10 +9,10 @@ using UnityEngine;
 using System.Collections;
 using System.Collections.Generic;
 
-public class MuninAlgo 
+public class MuninAlgo : MonoBehaviour
 {
     // String <=> Coordonnées Cases "xxx:yyy"
-    // Char   <=> Disponibilité de la case (G = Ground, A = Allowed, W = Wall, T = Tower, L = LockPath)
+    // Char   <=> Disponibilité de la case (G = Ground, A = Attente, W = Wall, B = Barricace)
     private Dictionary<string, char> _gridMapping;
     public Dictionary<string, char> GridMapping 
     {
@@ -20,229 +20,237 @@ public class MuninAlgo
         set { _gridMapping = value; }
     }
 
-    // String <=> Coordonnées Cases "xxx:yyy"
-    // Ushort <=> Donne l'état des cases adjacentes
-    /* 
-    Fonctionnement du mapping, chaque tour adjacente ajoute le nombre indiqué:
-    0x40 | 0x80 | 0x01
-    0x20 | Tour | 0x02
-    0x10 | 0x08 | 0x04
-        
-    Par exemple, une tour en bas à droite ajoute 0x04 au compteur et une tour en haut ajoute 0x80, ainsi, la valeur sera de 0x84
-    */
-    private Dictionary<string, ushort> _griState;
-    public Dictionary<string, ushort> GridState 
-    {
-        get { return _griState; }
-        set { _griState = value; }
-    }
 
 
-    public MuninAlgo()
+    NavMeshAgent _gridMaker;
+
+
+    public MuninAlgo(NavMeshAgent gridMaker)
     {
         GridMapping = new Dictionary<string, char>();
-        GridState = new Dictionary<string, ushort>();
+
+        _gridMaker = gridMaker;
     }
 
     public void InitiateGrid()
     {
-        for (int x = -48; x <= 48; x += 2)
+        // X: -36 -> 40
+        // Z: -30 -> 30
+        int i = 0;
+        int j = 0;
+
+
+        for (int x = -50; x <= 55; x += 2)
         {
-            for (int z = -38; z <= 38; z += 2)
+            for (int z = -40; z <= 40; z += 2)
             {
-                string coord = x.ToString() + ":" + z.ToString();
-                if (GridMapping[coord] == 'W')
+                NavMeshPath path = new NavMeshPath();
+                _gridMaker.CalculatePath(new Vector3(x, 0, z), path);
+                if (path.status == NavMeshPathStatus.PathComplete)
                 {
-                    GridState[(x + 2).ToString() + ":" + (z + 2).ToString()] += 0x01;
-                    GridState[(x + 2).ToString() + ":" + (z    ).ToString()] += 0x02;
-                    GridState[(x + 2).ToString() + ":" + (z - 2).ToString()] += 0x04;
-                    GridState[(x    ).ToString() + ":" + (z - 2).ToString()] += 0x08;
-                    GridState[(x - 2).ToString() + ":" + (z - 2).ToString()] += 0x10;
-                    GridState[(x - 2).ToString() + ":" + (z    ).ToString()] += 0x20;
-                    GridState[(x - 2).ToString() + ":" + (z + 2).ToString()] += 0x40;
-                    GridState[(x    ).ToString() + ":" + (z + 2).ToString()] += 0x80;
+                    GridMapping.Add(x.ToString() + ":" + z.ToString(), 'G');
+                    i++;
+                }
+                else
+                {
+                    GridMapping.Add(x.ToString() + ":" + z.ToString(), 'W');
+                    j++;
                 }
             }
         }
+        Debug.Log("Access: " + i + ", Denied: " + j);
     }
 
-    public bool accessRequest(float x, float z)
+    public bool accessRequest(float x, float z, Vector3 positionPlayer)
     {
         bool access = false;
         string coor = x.ToString() + ":" + z.ToString();
 
-        if ((GridMapping[coor] == 'G')||(GridMapping[coor] == 'A'))
-            access = true;
+        GridMapping[coor] = 'A';
+        access = AlgoAEtoile(positionPlayer);
+        GridMapping[coor] = 'G';
 
         return access;
     }
+
+    bool AlgoAEtoile(Vector3 cible)
+    {
+        int cibleX = (int) roundNumber(cible.x);
+        int cibleY = (int) roundNumber(cible.z);
+
+        int[]  departx = new int[2]  { -38, 42 };
+        int[]  departy = new int[2]  {   0,  0 };
+        bool[] acccess = new bool[2] { false, false };
+        bool accessGranted = false;
+
+        for(int i = 0; i < 2; i++)
+        {
+            Dictionary<string, int> GridOuvert = new Dictionary<string, int>();
+            List<string> GridFermer = new List<string>();
+
+            int dist = CalculDistance(departx[i], departy[i], cibleX, cibleY);
+            GridOuvert.Add(departx[i].ToString() + ":" + departy[i].ToString(), dist);
+
+            while (GridOuvert.Count != 0)
+            {
+                string closeCase = SelectCloser(GridOuvert, cibleX, cibleY);
+                string cibleCoor = cibleX.ToString() + ":" + cibleY.ToString();
+
+                if( closeCase == cibleCoor)
+                {
+                    acccess[i] = true;
+                    break;
+                }
+                 
+                string[] coor = new string[2];
+                coor = closeCase.Split(':');
+
+                int[] coordonate = new int[2];
+                coordonate[0] = (int) roundNumber(float.Parse(coor[0]));
+                coordonate[1] = (int) roundNumber(float.Parse(coor[1]));
+                
+                string up = (coordonate[0] + 0).ToString() + ":" + (coordonate[1] + 2).ToString();
+                if (GridMapping.ContainsKey(up) && GridMapping[up] == 'G')
+                {
+                    dist = CalculDistance((coordonate[0] + 0), (coordonate[1] + 2), cibleX, cibleY);
+                    if (!GridFermer.Contains(up) && !GridOuvert.ContainsKey(up))
+                    {
+                        GridOuvert.Add(up, dist);
+                    }
+                    else if(GridOuvert.ContainsKey(up) && GridOuvert[up] > dist)
+                    {
+                        GridOuvert[up] = dist;
+                    }
+                }
+
+                string down = (coordonate[0] + 0).ToString() + ":" + (coordonate[1] - 2).ToString();
+                if (GridMapping.ContainsKey(down) && GridMapping[down] == 'G')
+                {
+                    dist = CalculDistance((coordonate[0] + 0), (coordonate[1] - 2), cibleX, cibleY);
+                    if (!GridFermer.Contains(down) && !GridOuvert.ContainsKey(down))
+                    {
+                        GridOuvert.Add(down, dist);
+                    }
+                    else if (GridOuvert.ContainsKey(down) && GridOuvert[down] > dist)
+                    {
+                        GridOuvert[down] = dist;
+                    }
+                }
+
+                string left = (coordonate[0] - 2).ToString() + ":" + (coordonate[1] + 0).ToString();
+                if (GridMapping.ContainsKey(left) && GridMapping[left] == 'G')
+                {
+                    dist = CalculDistance((coordonate[0] - 2), (coordonate[1] + 0), cibleX, cibleY);
+                    if (!GridFermer.Contains(left) && !GridOuvert.ContainsKey(left))
+                    {
+                        GridOuvert.Add(left, dist);
+                    }
+                    else if (GridOuvert.ContainsKey(left) && GridOuvert[left] > dist)
+                    {
+                        GridOuvert[left] = dist;
+                    }
+                }
+
+                string right = (coordonate[0] + 2).ToString() + ":" + (coordonate[1] + 0).ToString();
+                if (GridMapping.ContainsKey(right) && GridMapping[right] == 'G')
+                {
+                    dist = CalculDistance((coordonate[0] + 2), (coordonate[1] + 0), cibleX, cibleY);
+                    if (!GridFermer.Contains(right) && !GridOuvert.ContainsKey(right))
+                    {
+                        GridOuvert.Add(right, dist);
+                    }
+                    else if (GridOuvert.ContainsKey(right) && GridOuvert[right] > dist)
+                    {
+                        GridOuvert[right] = dist;
+                    }
+                }
+
+                GridFermer.Add(closeCase);
+                GridOuvert.Remove(closeCase);
+            }
+        }
+        if (acccess[0] && acccess[1])
+            accessGranted = true;
+
+        return accessGranted;
+    }
+
+    int CalculDistance(int posX, int posY, int endX, int endY)
+    {
+        int result = 0;
+        result += posX > endX ? posX - endX : endX - posX;
+        result += posY > endY ? posY - endY : endY - posY;
+        return result;
+    }
+
+    string SelectCloser(Dictionary<string, int> GridOuvert, int endX, int endY)
+    {
+        int pos = 1000;
+        string resultCloser = "50:50";
+         
+        foreach (KeyValuePair<string, int> Case in GridOuvert)
+        {
+            if (Case.Value < pos)
+            {
+                resultCloser = Case.Key;
+                pos = Case.Value;
+            }
+            else if (Case.Value == pos)
+            {
+                string[] coor = new string[2];
+                coor = resultCloser.Split(':');
+
+                int[] coordonateClose = new int[2];
+                coordonateClose[0] = (int)roundNumber(float.Parse(coor[0]));
+                coordonateClose[1] = (int)roundNumber(float.Parse(coor[1]));
+
+
+                string[] coorAct = new string[2];
+                coorAct = Case.Key.Split(':');
+
+                int[] coordonateActClose = new int[2];
+                coordonateActClose[0] = (int)roundNumber(float.Parse(coorAct[0]));
+                coordonateActClose[1] = (int)roundNumber(float.Parse(coorAct[1]));
+
+                int diffCloseX    = coordonateClose[0]    > endX ? coordonateClose[0]    - endX : endX - coordonateClose[0];
+                int diffCloseActX = coordonateActClose[0] > endX ? coordonateActClose[0] - endX : endX - coordonateActClose[0];
+                int diffCloseY    = coordonateClose[1]    > endY ? coordonateClose[1]    - endY : endY - coordonateClose[1];
+                int diffCloseActY = coordonateActClose[1] > endY ? coordonateActClose[1] - endY : endY - coordonateActClose[1];
+                if ((diffCloseY > diffCloseActY) || (diffCloseY == diffCloseActY) && (diffCloseX > diffCloseActX))
+                {
+                    resultCloser = Case.Key;
+                    pos = Case.Value;
+                }
+            }
+        }
+
+        return resultCloser;
+    }
+
 
     public void BuildTower(float x, float z)
     {
         string coor = x.ToString() + ":" + z.ToString();
         GridMapping[coor] = 'T';
-
-        GridState[(x + 2).ToString() + ":" + (z + 2).ToString()] += 0x01;
-        GridState[(x + 2).ToString() + ":" + (z    ).ToString()] += 0x02;
-        GridState[(x + 2).ToString() + ":" + (z - 2).ToString()] += 0x04;
-        GridState[(x    ).ToString() + ":" + (z - 2).ToString()] += 0x08;
-        GridState[(x - 2).ToString() + ":" + (z - 2).ToString()] += 0x10;
-        GridState[(x - 2).ToString() + ":" + (z    ).ToString()] += 0x20;
-        GridState[(x - 2).ToString() + ":" + (z + 2).ToString()] += 0x40;
-        GridState[(x    ).ToString() + ":" + (z + 2).ToString()] += 0x80;
-
-        UpdateGrid(x + 2, z + 2);
-        UpdateGrid(x + 2, z    );
-        UpdateGrid(x + 2, z - 2);
-        UpdateGrid(x    , z - 2);
-        UpdateGrid(x - 2, z - 2);
-        UpdateGrid(x - 2, z    );
-        UpdateGrid(x - 2, z + 2);
-        UpdateGrid(x    , z + 2);
     }
 
-    public void UpdateGrid(float x, float z)
+    float roundNumber(float value)
     {
-        string coor = x.ToString() + ":" + z.ToString();
+        float new_value = 0;
 
-        if (SpecialCase(coor) && ((GridMapping[coor] == 'G') || (GridMapping[coor] == 'A'))) 
+        if (value >= 0)
         {
-            if (LockPath(x, z))
-            {
-                GridMapping[coor] = 'L';
-
-                char stateR = GridMapping[(x + 2).ToString() + ":" + (z).ToString()];
-                if ((stateR == 'G') || (stateR == 'A'))
-                    GridMapping[(x + 2).ToString() + ":" + (z).ToString()] = 'L';
-
-                char stateL = GridMapping[(x - 2).ToString() + ":" + (z).ToString()];
-                if ((stateL == 'G') || (stateL == 'A'))
-                    GridMapping[(x - 2).ToString() + ":" + (z).ToString()] = 'L';
-
-                char stateU = GridMapping[(x).ToString() + ":" + (z + 2).ToString()];
-                if ((stateU == 'G') || (stateU == 'A'))
-                    GridMapping[(x).ToString() + ":" + (z + 2).ToString()] = 'L';
-
-                char stateD = GridMapping[(x).ToString() + ":" + (z - 2).ToString()];
-                if ((stateD == 'G') || (stateD == 'A'))
-                    GridMapping[(x).ToString() + ":" + (z - 2).ToString()] = 'L';
-
-                UpdateGrid(x + 2, z + 2);
-                UpdateGrid(x + 2, z    );
-                UpdateGrid(x + 2, z - 2);
-                UpdateGrid(x    , z - 2);
-                UpdateGrid(x - 2, z - 2);
-                UpdateGrid(x - 2, z    );
-                UpdateGrid(x - 2, z + 2);
-                UpdateGrid(x    , z + 2);
-            }
-            else
-            {
-                GridMapping[coor] = 'A';
-            }
+            new_value = Mathf.Ceil(value);
+            if (new_value % 2 != 0)
+                new_value--;
         }
-    }
-
-    public bool SpecialCase(string coord)
-    {
-        bool result = false;
-
-        if ((GridState[coord] & 0x05) == 0x05)
-            result = true;
-        else if ((GridState[coord] & 0x09) == 0x09)
-            result = true;
-        else if ((GridState[coord] & 0x11) == 0x11)
-            result = true;
-        else if ((GridState[coord] & 0x21) == 0x21)
-            result = true;
-        else if ((GridState[coord] & 0x12) == 0x12)
-            result = true;
-        else if ((GridState[coord] & 0x22) == 0x22)
-            result = true;
-        else if ((GridState[coord] & 0x14) == 0x14)
-            result = true;
-        else if ((GridState[coord] & 0x24) == 0x24)
-            result = true;
-        else if ((GridState[coord] & 0x41) == 0x41)
-            result = true;
-        else if ((GridState[coord] & 0x42) == 0x42)
-            result = true;
-        else if ((GridState[coord] & 0x44) == 0x44)
-            result = true;
-        else if ((GridState[coord] & 0x48) == 0x48)
-            result = true;
-        else if ((GridState[coord] & 0x50) == 0x50)
-            result = true;
-        else if ((GridState[coord] & 0x84) == 0x84)
-            result = true;
-        else if ((GridState[coord] & 0x88) == 0x88)
-            result = true;
-        else if ((GridState[coord] & 0x90) == 0x90)
-            result = true;
-
-        return result;
-    }
-
-    public bool LockPath(float x, float z)
-    {
-        bool noPath = true;
-
-        bool accessR = false;
-        bool accessL = false;
-        bool accessU = false; 
-        bool accessD = false;
-
-        float i = 2;
-        while (GridMapping[(x + i).ToString() + ":" + (z).ToString()] != 'W')
+        else // Value < 0
         {
-            char state = GridMapping[(x + i).ToString() + ":" + (z).ToString()];
-            if (state == 'A' || state == 'G' || state == 'L')
-            {
-                accessR = true;
-                break;
-            }
-            i += 2;
+            new_value = Mathf.Floor(value);
+            if (new_value % 2 != 0)
+                new_value++;
         }
 
-        i = 2;
-        while (GridMapping[(x - i).ToString() + ":" + (z).ToString()] != 'W')
-        {
-            char state = GridMapping[(x - i).ToString() + ":" + (z).ToString()];
-            if (state == 'A' || state == 'G' || state == 'L')
-            {
-                accessL = true;
-                break;
-            }
-            i += 2;
-        }
-
-        i = 2;
-        while (GridMapping[(x).ToString() + ":" + (z + i).ToString()] != 'W')
-        {
-            char state = GridMapping[(x).ToString() + ":" + (z + i).ToString()];
-            if (state == 'A' || state == 'G' || state == 'L')
-            {
-                accessU = true;
-                break;
-            }
-            i += 2;
-        }
-
-        i = 2;
-        while (GridMapping[(x).ToString() + ":" + (z - i).ToString()] != 'W')
-        {
-            char state = GridMapping[(x).ToString() + ":" + (z - i).ToString()];
-            if (state == 'A' || state == 'G' || state == 'L')
-            {
-                accessD = true;
-                break;
-            }
-            i += 2;
-        }
-
-        if ((accessR || accessL) && (accessU || accessD))
-            noPath = false;
-
-        return noPath;
+        return new_value;
     }
 }

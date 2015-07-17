@@ -15,9 +15,10 @@ using System.Collections.Generic;
 // Script: Player Script
 // 
 // --------------------------------------------------
-public class PlayerScript : MonoBehaviour 
+public class PlayerScript : MonoBehaviour
 {
-    public int playerId = 0;
+    public int idPlayer; 
+    public bool init = false;
 
     public float Health
     {
@@ -38,7 +39,7 @@ public class PlayerScript : MonoBehaviour
     [SerializeField]
     private Text _message;
 
-	int LevelArmor = 0;
+
 
     void Start()
     {
@@ -54,6 +55,7 @@ public class PlayerScript : MonoBehaviour
         Interface = GameObject.Find("Message");
         _message = (Text)Interface.GetComponent("Text");
     } 
+
     void FixedUpdate()
     {
         if(Health != AncientHealth)
@@ -70,13 +72,6 @@ public class PlayerScript : MonoBehaviour
         }
     }
 
-	public void IncreaseHealth(int level)
-	{
-		InitialHealth = InitialHealth + (5*(level-LevelArmor));
-		health = health + (5*(level-LevelArmor));
-		LevelArmor = LevelArmor + level;
-	}
-
     IEnumerator death()
     {
         _message.text = "Game Over";
@@ -85,6 +80,7 @@ public class PlayerScript : MonoBehaviour
 
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
+        Network.Disconnect();
         Application.LoadLevel("Menu");
     }
 }

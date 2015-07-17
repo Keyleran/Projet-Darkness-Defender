@@ -21,6 +21,9 @@ public class SoldierScript : MonoBehaviour
     [SerializeField]
     EnemyPoolScript poolRappel;
 
+    [SerializeField]
+    EnemiesScript soldier;
+
     private bool raz = true;
 
     [SerializeField]
@@ -33,23 +36,26 @@ public class SoldierScript : MonoBehaviour
             raz = false;
         }
     }
+
     IEnumerator OnTriggerEnter(Collider _EnCol)
     {
-        if (_EnCol.tag == "Projectile")
+        if(Network.isServer)
         {
-            yield return new WaitForFixedUpdate();
-            AmmoScript projectile = (AmmoScript) _EnCol.gameObject.GetComponent("AmmoScript");
-            actualHealth -= projectile.damage;
-        }
+            if (_EnCol.tag == "Projectile")
+            {
+                yield return new WaitForFixedUpdate();
+                AmmoScript projectile = (AmmoScript)_EnCol.gameObject.GetComponent("AmmoScript");
+                actualHealth -= projectile.damage;
+            }
 
-        if (actualHealth == 0)
-            killEnemy();
+            if (actualHealth == 0)
+                killEnemy();
+        }
     }
 
     void killEnemy()
     {
-        EnemiesScript enemy = (EnemiesScript)this.gameObject.GetComponent("EnemiesScript");
-        poolRappel.ReturnEnemy(enemy);
+        poolRappel.ReturnEnemy(soldier.id);
         raz = true;
     }
 }

@@ -70,15 +70,12 @@ public class EnemiesScript : MonoBehaviour
 
     void Start()
     {
-        player       = GameObject.FindGameObjectWithTag("Player");
-        playerScript = (PlayerScript) player.GetComponent("PlayerScript");
         _Move.SetBool("Walk", true); 
     }
 
     void FixedUpdate()
     {
-        if(Network.isServer)
-            _agent.SetDestination(player.transform.position);
+        _agent.SetDestination(player.transform.position);
     }
 
     void OnTriggerEnter(Collider col)
@@ -108,16 +105,25 @@ public class EnemiesScript : MonoBehaviour
 
     public void impactTower(int damage)
     {
-        new WaitForSeconds(0.5f);
-        actualHealth -= damage;
+        if(Network.isServer)
+        {
+            new WaitForSeconds(0.5f);
+            actualHealth -= damage;
 
-        if (actualHealth <= 0)
-            killEnemy();
+            if (actualHealth <= 0)
+                killEnemy();
+        }
+    }
+
+    public void SetTarget(GameObject playerTarget, PlayerScript playerScriptTarget)
+    {
+        player = playerTarget;
+        playerScript = playerScriptTarget;
     }
 
     void killEnemy()
     {
-        poolRappel.ReturnEnemy(this);
+        poolRappel.ReturnEnemy(id);
 
         actualHealth = health;
     }
