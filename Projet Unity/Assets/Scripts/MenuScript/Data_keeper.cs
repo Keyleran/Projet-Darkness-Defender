@@ -27,6 +27,7 @@ public class Data_keeper : MonoBehaviour
     public void SetSolo()
     {
         gameMode = "Solo";
+		Application.LoadLevel ("New_Map");
     }
 
     public void SetMulti()
