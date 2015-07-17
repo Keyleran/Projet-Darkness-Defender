@@ -115,6 +115,7 @@ public class TowerManagerScript : MonoBehaviour
 
     private Vector3 oldPosition;
     bool constructionWait = true;
+    int levelArmor = 0;
 
     void Start()
     {
@@ -140,6 +141,14 @@ public class TowerManagerScript : MonoBehaviour
             _ChoosenTowerFont.color = new Color(255, 255, 255, 0);
             _towers[0].color = new Color(0, 180, 0);
             constructChoose = 0;
+        }
+
+        if (Input.GetKeyDown(KeyCode.B))
+        {
+            levelArmor += 1;
+            float fPrice = 250 * Mathf.Pow(2, levelArmor);
+            int price = (int)fPrice;
+            Buy_Upgrade(price, levelArmor);
         }
 
         // Choix de la tour à construire
@@ -653,6 +662,15 @@ public class TowerManagerScript : MonoBehaviour
                 ShooterScript shooter = (ShooterScript)_shooterPoolScript._towers[id].gameObject.GetComponent("ShooterScript");
                 shooter.UpgradeTower();
                 break;
+        }
+    }
+
+    void Buy_Upgrade(int price, int level)
+    {
+        if (buildingMoney - price > 0)
+        {
+            ModifMoney(_player, -price);
+            ciblePlayer.IncreaseHealth(level);
         }
     }
 }

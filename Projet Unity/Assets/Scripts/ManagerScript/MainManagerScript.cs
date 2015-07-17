@@ -51,6 +51,9 @@ public class MainManagerScript : MonoBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+            _network.RPC("OnDisconnect", RPCMode.Others);
+
+            Network.Disconnect();
             Application.LoadLevel("Menu");
         }
 
@@ -181,7 +184,7 @@ public class MainManagerScript : MonoBehaviour
             _message.text = "Vous êtes maintenant dans le mode de contruction.\nLes cases en bas de votre écran indique les tours que vous pouvez construire.\nLa barricade est sélectionnée par défaut.\n(Appuyez sur \"E\")";
             yield return new WaitForSeconds(1);
             yield return StartCoroutine(WaitKeyDown(KeyCode.E));
-            _message.text = "La barricade sert de base aux autres Tours, elle est indispensable !\nVous pouvez construire les barricades sur les lieux surélevés.\nVous pouvez revendre les tours en appuyant sur \"E\".\n(Appuyez sur \"E\")";
+            _message.text = "La barricade sert de base aux autres Tours, elle est indispensable !\nVous pouvez construire les barricades sur les lieux surélevés.\nVous pouvez revendre les tours en appuyant sur \"V\".\n(Appuyez sur \"E\")";
             yield return new WaitForSeconds(1);
             yield return StartCoroutine(WaitKeyDown(KeyCode.E));
             _message.text = "Une fois la barricade construite, vous pouvez acheter une Tour. Sélectionner la tour \"Shooter\".\n(Appuyez sur \"2\" ou \"é\")";
@@ -189,8 +192,9 @@ public class MainManagerScript : MonoBehaviour
             yield return StartCoroutine(WaitKeyDown(KeyCode.Alpha2));
             _message.text = "La construction de tour et de barricade coûte des matériaux, faites attention !\n Le nombre de matériax restant est indiqué en bas à gauche de votre écran.\n(Appuyez sur \"E\")";
             yield return StartCoroutine(WaitKeyDown(KeyCode.E));
-            _message.text = "Pour le moment, vous n'avez accès qu'à 2 tours.\nUn peu de patience, les 6 autres arriveront prochainement\n(Appuyez sur \"E\")";
-            yield return new WaitForSeconds(1);
+            _message.text = "Vous pouvez améliorer vos tours en appuyant \"U\". Pour améliorer une tour, appuyer sur \"A\", puis séléctionner la tour Shooter, pour finir, appuyer sur \"U\". Coût par niveau: 100\n(Appuyez sur \"E\")";
+            yield return StartCoroutine(WaitKeyDown(KeyCode.E));
+            _message.text = "Une dernière chose, vous pouvez acheter un amélioration de santé en appuyant sur \"B\". Coût par niveau: 500/1000/2000/4000/8000\n(Appuyez sur \"E\")";
             yield return StartCoroutine(WaitKeyDown(KeyCode.E));
             _message.text = "Ce tutoriel est maintenant fini ! Que le côté obscur soit avec vous !\n(Appuyez sur \"E\")";
             yield return new WaitForSeconds(1);
@@ -258,5 +262,14 @@ public class MainManagerScript : MonoBehaviour
         }
 
         Time.timeScale = gameState;
+    }
+
+    [RPC]
+    void OnDisconnect()
+    {
+        _message.text = "Joueur Déconnecté, Arrêt de la partie dans 5 secondes...";
+        new WaitForSeconds(5);
+        Network.Disconnect();
+        Application.LoadLevel("Menu");
     }
 }

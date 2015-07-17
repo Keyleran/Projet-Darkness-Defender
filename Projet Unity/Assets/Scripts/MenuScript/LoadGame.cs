@@ -8,16 +8,22 @@
 using UnityEngine;
 using System.Collections;
 
-public class LoadGame : MonoBehaviour {
+public class LoadGame : MonoBehaviour 
+{
+
+    private const string typeName = "DarknessDefender";
+    private string gameName = "Darkness Defender";
+
 
     [SerializeField]
-    string _character;
+    Data_keeper _data;
 
-
-	void FixedUpdate()
-	{
-		Application.LoadLevel ("New_Map");
-		print(_character);
-	}
-
+    public void StartSolo()
+    {
+        _data.gameName = "Solo";
+        _data.gameMode = "Multi";
+        _data.isServer = true;
+        Application.LoadLevel("New_Map");
+    }	
 }
+ 

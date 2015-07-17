@@ -59,8 +59,8 @@ public class PlayerScript : MonoBehaviour
 
     public void IncreaseHealth(int level)
     {
-        InitialHealth = InitialHealth + (5 * (level - LevelArmor));
-        health = health + (5 * (level - LevelArmor));
+        InitialHealth = InitialHealth + (50 * (level - LevelArmor));
+        health = health + (50 * (level - LevelArmor));
         LevelArmor = LevelArmor + level;
     }
 
