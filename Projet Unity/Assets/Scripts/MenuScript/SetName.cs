@@ -15,19 +15,22 @@ public class SetName : MonoBehaviour {
 	[SerializeField]
 	GameObject _parent;
 
+	[SerializeField]
+	public GUISkin Skin_Button;
+
 	void OnGUI() {
 
-		gameName = GUI.TextField(new Rect(200, 180, 80, 50), gameName, 25);
+		gameName = GUI.TextField(new Rect((Screen.width - 90)/2, (Screen.height - 60)/2, 170, 40), gameName, 25);
 
-		GUI.backgroundColor = Color.black;
+		GUI.skin = Skin_Button;
 
-		if (GUI.Button(new Rect(250, 250, 80, 50), "Valider"))
+		if (GUI.Button(new Rect((Screen.width - 90)/2, (Screen.height + 60)/2, 80, 40), "Valider"))
 		{
 			this.gameObject.SetActive(false);
 			_parent.SetActive(true);
 			_parent.SendMessage("SetName", gameName);
 		}
-		if (GUI.Button(new Rect(500, 500, 120, 50), "Retour"))
+		if (GUI.Button(new Rect((Screen.width + 90)/2, (Screen.height + 60)/2, 80, 40), "Retour"))
 		{
 			this.gameObject.SetActive(false);
 			_parent.SetActive(true);
