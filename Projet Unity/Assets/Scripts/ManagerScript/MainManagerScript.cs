@@ -115,16 +115,13 @@ public class MainManagerScript : MonoBehaviour
 
     void SetId()
     {
-        print("id: " + nb_player);
         foreach (GameObject player in GameObject.FindGameObjectsWithTag("Player"))
         {
-            print("test");
             PlayerScript initPlayer = (PlayerScript)player.GetComponent("PlayerScript");
 
             if(initPlayer.init == false)
             {
                 initPlayer.idPlayer = nb_player;
-                print(nb_player);
                 initPlayer.init = true;
             }
         }  

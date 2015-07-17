@@ -20,8 +20,6 @@ public class MuninAlgo : MonoBehaviour
         set { _gridMapping = value; }
     }
 
-
-
     NavMeshAgent _gridMaker;
 
 

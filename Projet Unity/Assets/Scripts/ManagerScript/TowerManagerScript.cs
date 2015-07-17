@@ -34,7 +34,6 @@ public class TowerManagerScript : MonoBehaviour
     private bool constructMode  = false;
     private int constructChoose = 0;
     private int buildingMoney   = 600;
-    private Vector3 lastCursor  = new Vector3(0, 0, 0);
     public int _player;
     bool coroutineState = false;
     private IEnumerator coConstruction;
@@ -302,7 +301,7 @@ public class TowerManagerScript : MonoBehaviour
                 if (Input.GetMouseButtonDown(0))
                 {
                     yield return WaitMouseUp();
-                    if ((hit.collider.tag == "Ground") && access)
+                    if ((hit.collider.tag == "Ground") && access && (constructChoose == 0))
                     {
                         constructionWait = true;
                         if (Network.isServer)
@@ -514,30 +513,6 @@ public class TowerManagerScript : MonoBehaviour
                 network.RPC("SellTowerNetwork", RPCMode.All, "Shooter", tower.id);
                 network.RPC("UpdateBar", RPCMode.All, tower.id_barricade);
                 break;
-            case "Canon":
-                buildingMoney += 150;
-                _buildingMoney.text = "Matériaux: " + buildingMoney;
-                break;
-            case "Fire":
-                buildingMoney += 200;
-                _buildingMoney.text = "Matériaux: " + buildingMoney;
-                break;
-            case "Ice":
-                buildingMoney += 100;
-                _buildingMoney.text = "Matériaux: " + buildingMoney;
-                break;
-            case "Poison":
-                buildingMoney += 100;
-                _buildingMoney.text = "Matériaux: " + buildingMoney;
-                break;
-            case "Magic":
-                buildingMoney += 200;
-                _buildingMoney.text = "Matériaux: " + buildingMoney;
-                break;
-            case "Detector":
-                buildingMoney += 150;
-                _buildingMoney.text = "Matériaux: " + buildingMoney;
-                break;
         }
     }
 
@@ -650,31 +625,16 @@ public class TowerManagerScript : MonoBehaviour
     [RPC]
     void SellTowerNetwork(string Type, int id)
     {
-        if (Network.isServer)
+        switch (Type)
         {
-            switch (Type)
-            {
-                case "Barricade":
-                    _barricadePoolScript.ReturnBarricade(id);
-                    break;
-                case "Shooter":
-                    _shooterPoolScript.ReturnTower(id);
-                    ShooterScript shooter = (ShooterScript)_shooterPoolScript._towers[id].gameObject.GetComponent("ShooterScript");
-                    shooter.RazLevel();
-                    break;
-                case "Canon":
-                    break;
-                case "Fire":
-                    break;
-                case "Ice":
-                    break;
-                case "Poison":
-                    break;
-                case "Magic":
-                    break;
-                case "Detector":
-                    break;
-            }
+            case "Barricade":
+                _barricadePoolScript.ReturnBarricade(id);
+                break;
+            case "Shooter":
+                _shooterPoolScript.ReturnTower(id);
+                ShooterScript shooter = (ShooterScript)_shooterPoolScript._towers[id].gameObject.GetComponent("ShooterScript");
+                shooter.RazLevel();
+                break;
         }
     }
 
@@ -692,18 +652,6 @@ public class TowerManagerScript : MonoBehaviour
             case "Shooter":
                 ShooterScript shooter = (ShooterScript)_shooterPoolScript._towers[id].gameObject.GetComponent("ShooterScript");
                 shooter.UpgradeTower();
-                break;
-            case "Canon":
-                break;
-            case "Fire":
-                break;
-            case "Ice":
-                break;
-            case "Poison":
-                break;
-            case "Magic":
-                break;
-            case "Detector":
                 break;
         }
     }

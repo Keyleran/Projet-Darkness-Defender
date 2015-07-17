@@ -39,7 +39,8 @@ public class PlayerScript : MonoBehaviour
     [SerializeField]
     private Text _message;
 
-	int LevelArmor = 0;
+    int LevelArmor = 0;
+
 
     void Start()
     {
@@ -54,7 +55,14 @@ public class PlayerScript : MonoBehaviour
 
         Interface = GameObject.Find("Message");
         _message = (Text)Interface.GetComponent("Text");
-    } 
+    }
+
+    public void IncreaseHealth(int level)
+    {
+        InitialHealth = InitialHealth + (5 * (level - LevelArmor));
+        health = health + (5 * (level - LevelArmor));
+        LevelArmor = LevelArmor + level;
+    }
 
     void FixedUpdate()
     {
@@ -71,13 +79,6 @@ public class PlayerScript : MonoBehaviour
             }
         }
     }
-
-	public void IncreaseHealth(int level)
-	{
-		InitialHealth = InitialHealth + (5*(level-LevelArmor));
-		health = health + (5*(level-LevelArmor));
-		LevelArmor = LevelArmor + level;
-	}
 
     IEnumerator death()
     {

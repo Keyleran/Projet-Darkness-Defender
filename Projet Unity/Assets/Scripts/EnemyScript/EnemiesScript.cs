@@ -24,9 +24,6 @@ public class EnemiesScript : MonoBehaviour
     EnemyPoolScript poolRappel;
 
     [SerializeField]
-    private int actualHealth;
-
-    [SerializeField]
     Transform _transform;
 
     [SerializeField]
@@ -57,21 +54,23 @@ public class EnemiesScript : MonoBehaviour
     }
 
     [SerializeField]
-    NavMeshAgent _agent;
-
-    [SerializeField]
-    Animator _Move;
+    public NavMeshAgent _agent;
 
     [SerializeField]
     NetworkView _network;
 
+    [SerializeField]
+    public Material[] _levels;
+
+    [SerializeField]
+    Renderer[] _indicLvl;
+
+    public int levelEnnemi = 0;
+    public int Loop = 0;
+    public int actualHealth = 20;
+    public int damage = 2;
     private GameObject player;
     private PlayerScript playerScript;
-
-    void Start()
-    {
-        _Move.SetBool("Walk", true); 
-    }
 
     void FixedUpdate()
     {
@@ -93,13 +92,14 @@ public class EnemiesScript : MonoBehaviour
             StopCoroutine("TakeDamage");
         }
     }
-
+     
     IEnumerator TakeDamage()
     {
         while(true)
         {
             yield return new WaitForSeconds(1);
-            playerScript.Health -= 2;
+
+            playerScript.Health -= damage;
         }
     }
 
@@ -123,13 +123,31 @@ public class EnemiesScript : MonoBehaviour
 
     void killEnemy()
     {
-        poolRappel.ReturnEnemy(id);
-
-        actualHealth = health;
+        if (Network.isServer)
+        {
+            poolRappel.ReturnEnemy(id);
+        }
     }
 
-    public void InitEnemy()
+    public void InitEnemy(int level, int waveLoop)
     {
-        actualHealth = health;
+        levelEnnemi = level;
+        Loop = waveLoop;
+
+        ChangeColor(levelEnnemi);
+
+        levelEnnemi = levelEnnemi == 0 ? 1 : levelEnnemi;
+        Loop = Loop == 0 ? 1 : Loop;
+        damage = 2 * (levelEnnemi * 2) * (Loop * 2);
+
+        actualHealth = health * levelEnnemi * Loop;
+    }
+
+    private void ChangeColor(int level)
+    {
+        foreach (Renderer indic in _indicLvl)
+        {
+            indic.material = _levels[level];
+        }
     }
 }

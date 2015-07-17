@@ -41,7 +41,6 @@ public class EnemyPoolScript : MonoBehaviour {
     // Renvoi une tour à chaque appel
     public EnemiesScript GetEnemy()
     {
-        countEnemiesUse++;
         if (idEnemiesUnset.Count != 0)
         {
             EnemiesScript enemy = null;
@@ -50,12 +49,11 @@ public class EnemyPoolScript : MonoBehaviour {
             idEnemiesUnset.Remove(id);
             enemy = _enemies[id];
 
-            enemy.gameObject.SetActive(true);
             return enemy;
         }
-
         return null;
     }
+
 
     // ----------
     //
@@ -66,7 +64,6 @@ public class EnemyPoolScript : MonoBehaviour {
     {
         if (Network.isServer)
         {
-            idEnemiesUnset.Add(_enemies[id].id); // Retire l'objet de la liste des projectiles utilisés
             _network.RPC("ReturnEnemyRPC", RPCMode.All, id);
         }
     }
@@ -75,8 +72,11 @@ public class EnemyPoolScript : MonoBehaviour {
     public void ReturnEnemyRPC(int id)
     {
         countEnemiesUse--;
-        _enemies[id].Transform.position = this.transform.position; // Replace le projectile dans la pool
-        _enemies[id].gameObject.SetActive(false); // Désactive le gameobject
+        print(id); 
+        Desactive(id); // Désactive le gameobject 
+        _enemies[id].transform.position = this.gameObject.transform.position; // Replace le projectile dans la pool
+        idEnemiesUnset.Add(id); // Retire l'objet de la liste des projectiles utilisés
+        _enemies[id].InitEnemy(1,1);
     }
 
     public void Active(int id)

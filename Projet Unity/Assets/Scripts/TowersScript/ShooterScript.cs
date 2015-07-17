@@ -74,7 +74,7 @@ public class ShooterScript : MonoBehaviour
         {
             yield return new WaitForFixedUpdate();
 
-            if (_enemiesScript[0].transform.position == new Vector3(0, -5, 0))
+            if (_enemiesScript[0].transform.position == new Vector3(0, -100, 0))
                 _enemiesScript.Remove(_enemiesScript[0]);
 
             if (_enemiesScript.Count == 0)
@@ -96,9 +96,9 @@ public class ShooterScript : MonoBehaviour
 
                     yield return new WaitForSeconds(_shootDelay);
                     _enemiesScript[0].impactTower(damageTower);
-                    _ammoShooter.ReturnProjectile(ps);
+                    _ammoShooter.ReturnProjectile(ps); 
                 }
-            }
+            } 
         }
     }
 
