@@ -12,8 +12,10 @@ Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Darkness De
 Loading E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Darkness Defender_Data\Managed\Assembly-CSharp.dll into Unity Child Domain
 Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Darkness Defender_Data\Managed\UnityEngine.UI.dll (this message is harmless)
 Loading E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Darkness Defender_Data\Managed\UnityEngine.UI.dll into Unity Child Domain
-- Completed reload, in  0.209 seconds
+- Completed reload, in  0.106 seconds
 desktop: 1920x1080 60Hz; virtual: 1920x1080 at 0,0
 <RI> Initializing input.
 <RI> Input initialized.
-Waiting for finish
+<RI> Initialized touch support.
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Darkness Defender_Data\Managed\System.Core.dll (this message is harmless)
+Platform assembly: E:\ESGI\Projet Annuel\Unity\Darkness Defender\exe\Darkness Defender_Data\Managed\System.dll (this message is harmless)

@@ -72,7 +72,7 @@ public class PlayerScript : MonoBehaviour
             _healthBar.value = 1 - (health / InitialHealth);
             _health.text = Health.ToString() + " / " + InitialHealth.ToString();
 
-            if (Health == 0)
+            if (Health <= 0)
             {
                 // GameOver
                 StartCoroutine("death");
@@ -82,8 +82,8 @@ public class PlayerScript : MonoBehaviour
 
     IEnumerator death()
     {
-        _message.text = "Game Over";
-        _message.fontSize = 30;
+        _message.text = "Game Over\nRetour au menu principal\ndans 5 secondes";
+        _message.fontSize = 20;
         yield return new WaitForSeconds(5);
 
         Cursor.lockState = CursorLockMode.None;

@@ -115,7 +115,7 @@ public class ShooterScript : MonoBehaviour
 
         if(levelTower < 4)
         {
-            damageTower += 2;
+            damageTower = (int) Mathf.Pow(2, levelTower);
             _shootDelay -= 0.2f;
             levelTower++;
             ChangeColor(levelTower);

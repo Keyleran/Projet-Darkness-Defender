@@ -7,7 +7,6 @@
 // Library
 using UnityEngine;
 using System.Collections;
-
 // --------------------------------------------------
 // 
 // Script unités
@@ -138,7 +137,7 @@ public class EnemiesScript : MonoBehaviour
 
         levelEnnemi = levelEnnemi == 0 ? 1 : levelEnnemi;
         Loop = Loop == 0 ? 1 : Loop;
-        damage = 2 * (levelEnnemi * 2) * (Loop * 2);
+        damage = 2 * (int) Mathf.Pow(levelEnnemi, 2) * (int) Mathf.Pow(2, Loop);
 
         actualHealth = health * levelEnnemi * Loop;
     }
